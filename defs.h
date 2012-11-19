@@ -87,5 +87,39 @@
 #define TMR2_IE     IEC0bits.T2IE
 #define TMR3_IE     IEC0bits.T3IE
 /** @} */
-#endif
 
+
+/** @defgroup LCD_DISPLAY_DEFS LCD Display Definitions
+ * @{ */
+#define K1          LATBbits.LATB0
+#define K1_DIR      TRISBbits.TRISB0
+#define K2          LATBbits.LATB1
+#define K2_DIR      TRISBbits.TRISB1
+#define K3          LATBbits.LATB2
+#define K3_DIR      TRISBbits.TRISB2
+#define K4          LATEbits.LATE5
+#define K4_DIR      TRISEbits.TRISE5
+#define K5          LATEbits.LATE6
+#define K5_DIR      TRISEbits.TRISE6
+
+#define AA1         LATDbits.LATD7
+#define AA1_DIR     TRISDbits.TRISD7
+#define AB2         LATDbits.LATD6
+#define AB2_DIR     TRISDbits.TRISD6
+#define AC3         LATDbits.LATD5
+#define AC3_DIR     TRISDbits.TRISD5
+#define AD          LATDbits.LATD4
+#define AD_DIR      TRISDbits.TRISD4
+#define AE          LATDbits.LATD3
+#define AE_DIR      TRISDbits.TRISD3
+#define AF          LATDbits.LATD2
+#define AF_DIR      TRISDbits.TRISD2
+#define AG          LATDbits.LATD1
+#define AG_DIR      TRISDbits.TRISD1
+#define ADP         LATDbits.LATD0
+#define ADP_DIR     TRISDbits.TRISD0
+
+/** @} */
+
+
+#endif

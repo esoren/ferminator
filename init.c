@@ -45,7 +45,7 @@ void init(void) {
     //SETUP INDIVIDUAL IO PINS
     LED3_DIR = 0; //set debug leds as output
     LED4_DIR = 0;
-    
+ 
     //SD pins
     SDO1_PIN_DIR = 0; //SDO1 as output
     SDI1_PIN_DIR = 1; //SDI1 as input
@@ -53,6 +53,37 @@ void init(void) {
     SCK1_PIN_DIR = 0; //SCK1 as output
     SCK1_PIN = 1; //default on idle state
     
+    //LCD PINS
+    //turn off all characters/segments:
+    K1 = 1; //K pins are active low
+    K2 = 1;
+    K3 = 1;
+    K4 = 1;
+    K5 = 1;
+    AA1 = 0; //A pins are active high
+    AB2 = 0;
+    AC3 = 0;
+    AD = 0;
+    AE = 0;
+    AF = 0;
+    AG = 0;
+    ADP = 0;
+    //setup lcd pins as outputs
+    K1_DIR = 0;
+    K2_DIR = 0;
+    K3_DIR = 0;
+    K4_DIR = 0;
+    K5_DIR = 0;
+    AA1_DIR = 0;
+    AB2_DIR = 0;
+    AC3_DIR = 0;
+    AD_DIR = 0;
+    AE_DIR = 0;
+    AF_DIR = 0;
+    AG_DIR = 0;
+    ADP_DIR = 0;
+
+
     //setup pins AN0-AN11 as digital IO
     AD1PCFGL = 0xFFFF;
 	AD1PCFGH = 0xFFFF; 

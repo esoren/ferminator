@@ -9,7 +9,6 @@
 #include "defs.h"
 #include "globals.h"
 #include "spi_sd.h"
-#include "sram.h"
 #include <libpic30.h> //for delays
 
 /*! \brief Hangs until SD card is ready
@@ -476,9 +475,9 @@ unsigned char SD_WriteMultiBlock(unsigned long addr) {
     SPI1Write(0xFC); //send data token
 
     for(inc = 0; inc < BLOCK_SIZE; inc++) {
-		set_memory_address(addr++); // write the buffer pointer to memory address pins
-		data = memory_read();
-		SPI1Write(data); //Write the data to the sd card
+		//FIX THIS!!!!set_memory_address(addr++); // write the buffer pointer to memory address pins
+		//FIX THIS!!!!data = memory_read();
+		//FIX THIS!!!!SPI1Write(data); //Write the data to the sd card
     }
 
     SPI1Write(0xFF); //send CRC

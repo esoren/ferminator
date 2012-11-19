@@ -6,7 +6,6 @@
 extern unsigned long sd_address; 
 extern unsigned char receive_buffer;
 extern unsigned char *receive_ptr;
-extern unsigned volatile int sample;
 extern unsigned volatile char sync_flag;
 extern volatile unsigned long head;
 extern volatile unsigned long tail;

@@ -10,28 +10,6 @@
 
 #define FCY 40000000UL ///40 MIPS operating speed (used for __delay_ms() and __delay_S())
 
-
-/** @defgroup MODEM_PINS Modem Pins
- * @{ */
-//parallel pins for modem nibble transmissions
-#define MODEM0      LATDbits.LATD4
-#define MODEM1      LATDbits.LATD5
-#define MODEM2      LATDbits.LATD6
-#define MODEM3      LATDbits.LATD7
-#define MODEM0_DIR  TRISDbits.TRISD4
-#define MODEM1_DIR  TRISDbits.TRISD5
-#define MODEM2_DIR  TRISDbits.TRISD6
-#define MODEM3_DIR  TRISDbits.TRISD7
-
-#define MODEM_CTRL_0        PORTDbits.RD1		///The HEYRX pin is used by the MODEM to indicate to the CPU that a nibble transmission is ready on the modem pins
-#define MODEM_CTRL_0_DIR    TRISDbits.TRISD1
-#define MODEM_CTRL_1        LATDbits.LATD2		///The CLRTX pin is used by the CPU to tell the MODEM it has received a nibble and acted accordingly
-#define MODEM_CTRL_1_DIR    TRISDbits.TRISD2
-#define MODEM_CTRL_2        PORTDbits.RD3		///The SYNC flag is used by the modem to tell the CPU a sync pulse needs to be placed into the buffer
-#define MODEM_CTRL_2_DIR    TRISDbits.TRISD3
-/** @} */
-
-
 /** @defgroup MISC_PINS Misc Pins
  * @{ */
 #define LED3        LATDbits.LATD12
@@ -54,37 +32,6 @@
 #define CS1_PIN_DIR	TRISGbits.TRISG3
 /** @} */
 
-/** @defgroup ADC_PINS ADC Pins
- * @{ */
-#define SDI2_PULLUP_ENABLE  CNPU1bits.CN9PUE
-#define SDI2_PIN            PORTGbits.RG7
-#define SDI2_PIN_DIR        TRISGbits.TRISG7
-#define SCK2_PIN            LATGbits.LATG6
-#define SCK2_PIN_DIR        TRISGbits.TRISG6
-#define CS2_PIN             LATGbits.LATG8
-#define CS2_PIN_DIR         TRISGbits.TRISG8
-/** @} */
-
-/** @defgroup SRAM_PINS SRAM Pins
- * @{ */
-#define ADDR_L			LATB				///A0-A15
-#define ADDR_L_DIR		TRISB
-#define A16				LATFbits.LATF3  	///A16
-#define A16_DIR			TRISFbits.TRISF3  	///A16
-#define A17				LATFbits.LATF2  	///A17
-#define A17_DIR			TRISFbits.TRISF2  	///A17
-#define A18				LATDbits.LATD14		///A18
-#define A18_DIR			TRISDbits.TRISD14	///A18
-#define DATA_PORT_IN	PORTA				///only the LSB 0-7 are used for D0-D7
-#define DATA_PORT_OUT	LATA
-#define DATA_PORT_DIR   TRISA
-#define CE				LATAbits.LATA10
-#define CE_DIR			TRISAbits.TRISA10
-#define OE				LATFbits.LATF13
-#define OE_DIR			TRISFbits.TRISF13
-#define WE				LATFbits.LATF12
-#define WE_DIR			TRISFbits.TRISF12
-/** @} */
 
 /** @defgroup ERROR_DEFS Error Definitions
  * @{ */
@@ -125,16 +72,6 @@
 #define PRE_ERASE_TIMEOUT       1000	///CMD55 pre-erase timeout
 /** @} */
 
-/** @defgroup MODEM_COMMANDS Modem Commands
- * @{ */
-#define SYNC        0x80 /// insert sync flag into data
-#define HEADER      0x81 /// start the header
-#define CONFIG      0x82 /// not used
-#define START       0x83 /// end the header, start recording
-#define STOP        0x84 /// stop recording
-#define LED1_ON     0b10101010 ///turn LED 1 on
-#define LED1_OFF    0b01010101 /// turn LED 1 off
-/** @} */
 
 /** @defgroup INTERRUPT_DEFS Interrupt Definitions
  * @{ */

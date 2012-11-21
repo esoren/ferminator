@@ -32787,19 +32787,19 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="C12" library="rcl" deviceset="C-US" device="C0805" value="10u"/>
 <part name="VDD20" library="supply1" deviceset="VDD" device=""/>
 <part name="GND34" library="supply1" deviceset="GND" device=""/>
-<part name="U$2" library="eric_sorensen" deviceset="AD8497" device="" value="AD8495"/>
+<part name="U2" library="eric_sorensen" deviceset="AD8497" device="" value="AD8495"/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
-<part name="R8" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
-<part name="R9" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
-<part name="R10" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
-<part name="R11" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
-<part name="R12" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
-<part name="R13" library="rcl" deviceset="R-US_" device="R0805" value="47k"/>
+<part name="R8" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R9" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R10" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R11" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R12" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R13" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="VDD1" library="supply1" deviceset="VDD" device=""/>
 <part name="VDD2" library="supply1" deviceset="VDD" device=""/>
 <part name="CONN2" library="main2" deviceset="NEARLAB_SDCARD_HOLDER" device=""/>
 <part name="T2" library="zetex" deviceset="NMOSSOT23" device=""/>
-<part name="R16" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R16" library="rcl" deviceset="R-US_" device="R0805" value="22"/>
 <part name="R1" library="rcl" deviceset="R-US_" device="R0805" value="470"/>
 <part name="C4" library="rcl" deviceset="C-US" device="C0603" value=".1u"/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
@@ -32815,8 +32815,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="+3V1" library="supply1" deviceset="+3V3" device=""/>
 <part name="TX" library="adafruit" deviceset="LED" device="CHIP-LED0805" value="Red"/>
 <part name="RX" library="adafruit" deviceset="LED" device="CHIP-LED0805" value="Green"/>
-<part name="R2" library="adafruit" deviceset="R-US_" device="R0805" value="1K"/>
-<part name="R3" library="adafruit" deviceset="R-US_" device="R0805" value="1K"/>
+<part name="R2" library="adafruit" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R3" library="adafruit" deviceset="R-US_" device="R0805" value="1k"/>
 <part name="R5" library="adafruit" deviceset="R-US_" device="R0805" value="10"/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
@@ -32837,9 +32837,9 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="C9" library="rcl" deviceset="C-US" device="C0603" value=".1u"/>
 <part name="LED7" library="adafruit" deviceset="LED" device="CHIP-LED0805" value="Red"/>
-<part name="R4" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R4" library="rcl" deviceset="R-US_" device="R0805" value="5.6k"/>
 <part name="LED8" library="adafruit" deviceset="LED" device="CHIP-LED0805" value="Red"/>
-<part name="R6" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R6" library="rcl" deviceset="R-US_" device="R0805" value="5.6k"/>
 <part name="U$3" library="eric_sorensen" deviceset="PHOENIX-3.5MM" device=""/>
 <part name="P+6" library="supply1" deviceset="+24V" device=""/>
 <part name="GND16" library="supply1" deviceset="GND" device=""/>
@@ -32866,14 +32866,14 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="R22" library="rcl" deviceset="R-US_" device="R0805" value="100"/>
 <part name="R23" library="rcl" deviceset="R-US_" device="R0805" value="100"/>
 <part name="R24" library="rcl" deviceset="R-US_" device="R0805" value="100"/>
-<part name="R25" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R26" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R27" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R28" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R29" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R30" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R31" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
-<part name="R32" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
+<part name="R25" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R26" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R27" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R28" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R29" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R30" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R31" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
+<part name="R32" library="rcl" deviceset="R-US_" device="R0805" value="2.7k"/>
 <part name="R33" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
 <part name="R34" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
 <part name="R35" library="rcl" deviceset="R-US_" device="R0805" value="1k"/>
@@ -32893,13 +32893,13 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="THERM2" library="pinhead" deviceset="PINHD-1X2" device=""/>
 <part name="R40" library="rcl" deviceset="R-US_" device="R0805" value="1MEG"/>
 <part name="GND26" library="supply1" deviceset="GND" device=""/>
-<part name="C14" library="rcl" deviceset="C-US" device="C0603"/>
-<part name="C19" library="rcl" deviceset="C-US" device="C0603"/>
-<part name="C20" library="rcl" deviceset="C-US" device="C0603"/>
+<part name="C14" library="rcl" deviceset="C-US" device="C0603" value="10u"/>
+<part name="C19" library="rcl" deviceset="C-US" device="C0603" value="10u"/>
+<part name="C20" library="rcl" deviceset="C-US" device="C0603" value="10u"/>
 <part name="GND27" library="supply1" deviceset="GND" device=""/>
 <part name="GND28" library="supply1" deviceset="GND" device=""/>
-<part name="R41" library="rcl" deviceset="R-US_" device="R0805"/>
-<part name="R42" library="rcl" deviceset="R-US_" device="R0805"/>
+<part name="R41" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
+<part name="R42" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="THERM0" library="pinhead" deviceset="PINHD-1X2" device=""/>
 <part name="GND31" library="supply1" deviceset="GND" device=""/>
 <part name="VDD3" library="supply1" deviceset="VDD" device=""/>
@@ -32935,7 +32935,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="L1" library="rcl" deviceset="L-US" device="L3225M"/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="D1" library="diode" deviceset="DIODE-" device="SOD323-R"/>
-<part name="C1" library="rcl" deviceset="CPOL-EU" device="UD-6,3X8,8"/>
+<part name="C1" library="rcl" deviceset="CPOL-EU" device="UD-6,3X8,8" value="100u"/>
 <part name="CPU" library="pinhead" deviceset="PINHD-1X5" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="VDD9" library="supply1" deviceset="VDD" device=""/>
@@ -32998,7 +32998,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 </instance>
 <instance part="VDD20" gate="G$1" x="416.56" y="40.64"/>
 <instance part="GND34" gate="1" x="416.56" y="17.78"/>
-<instance part="U$2" gate="G$1" x="574.04" y="50.8"/>
+<instance part="U2" gate="G$1" x="574.04" y="50.8"/>
 <instance part="R1" gate="G$1" x="335.28" y="147.32" rot="R180"/>
 <instance part="C4" gate="G$1" x="327.66" y="142.24"/>
 <instance part="GND6" gate="1" x="327.66" y="132.08"/>
@@ -33329,7 +33329,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <junction x="256.54" y="129.54"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="+VS"/>
+<pinref part="U2" gate="G$1" pin="+VS"/>
 <wire x1="589.28" y1="53.34" x2="601.98" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="601.98" y1="53.34" x2="601.98" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="VDD3" gate="G$1" pin="VDD"/>
@@ -33524,7 +33524,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <segment>
 <pinref part="GND31" gate="1" pin="GND"/>
 <wire x1="553.72" y1="45.72" x2="553.72" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="-VS"/>
+<pinref part="U2" gate="G$1" pin="-VS"/>
 <wire x1="553.72" y1="50.8" x2="558.8" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -34272,7 +34272,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <label x="347.98" y="124.46" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="OUT"/>
+<pinref part="U2" gate="G$1" pin="OUT"/>
 <wire x1="589.28" y1="50.8" x2="594.36" y2="50.8" width="0.1524" layer="91"/>
 <label x="591.82" y="50.8" size="1.778" layer="95"/>
 <wire x1="594.36" y1="50.8" x2="594.36" y2="35.56" width="0.1524" layer="91"/>
@@ -34282,7 +34282,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <net name="N$32" class="0">
 <segment>
 <pinref part="R40" gate="G$1" pin="1"/>
-<pinref part="U$2" gate="G$1" pin="-IN"/>
+<pinref part="U2" gate="G$1" pin="-IN"/>
 <wire x1="553.72" y1="55.88" x2="556.26" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="556.26" y1="55.88" x2="558.8" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="556.26" y1="55.88" x2="556.26" y2="68.58" width="0.1524" layer="91"/>
@@ -34304,7 +34304,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="591.82" y1="68.58" x2="594.36" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="591.82" y1="68.58" x2="591.82" y2="55.88" width="0.1524" layer="91"/>
 <junction x="591.82" y="68.58"/>
-<pinref part="U$2" gate="G$1" pin="+IN"/>
+<pinref part="U2" gate="G$1" pin="+IN"/>
 <wire x1="591.82" y1="55.88" x2="589.28" y2="55.88" width="0.1524" layer="91"/>
 <pinref part="R42" gate="G$1" pin="2"/>
 <wire x1="591.82" y1="73.66" x2="591.82" y2="68.58" width="0.1524" layer="91"/>
@@ -34334,7 +34334,7 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="584.2" y1="35.56" x2="584.2" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="584.2" y1="40.64" x2="591.82" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="591.82" y1="40.64" x2="591.82" y2="48.26" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="SENSE"/>
+<pinref part="U2" gate="G$1" pin="SENSE"/>
 <wire x1="591.82" y1="48.26" x2="589.28" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 </net>

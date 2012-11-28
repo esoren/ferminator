@@ -50,11 +50,11 @@ unsigned char lcd_display(char digit, int value, char dots) {
 
 
     //turn off all characters
-    K1 = 1;
-    K2 = 1;
-    K3 = 1;
-    K4 = 1;
-    K5 = 1;
+    K1 = 0;
+    K2 = 0;
+    K3 = 0;
+    K4 = 0;
+    K5 = 0;
 
 
     //extract the character info for to assign the segments
@@ -72,95 +72,95 @@ unsigned char lcd_display(char digit, int value, char dots) {
     }
 
     //turn off all segments
-    AA1 = 0;
-    AB2 = 0;
-    AC3 = 0;
-    AD = 0;
-    AE = 0;
-    AF = 0;
-    AG = 0;
-    ADP = 0;
+    AA1 = 1;
+    AB2 = 1;
+    AC3 = 1;
+    AD = 1;
+    AE = 1;
+    AF = 1;
+    AG = 1;
+    ADP = 1;
 
 
     switch(segment_val) {
         case(0):
-            AA1 = 1;
-            AB2 = 1;
-            AC3 = 1;
-            AD = 1;
-            AE = 1;
-            AF = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AC3 = 0;
+            AD = 0;
+            AE = 0;
+            AF = 0;
             break;
         case(1):
-            AB2 = 1;
-            AC3 = 1;
+            AB2 = 0;
+            AC3 = 0;
             break;
         case(2):
-            AA1 = 1;
-            AB2 = 1;
-            AG = 1;
-            AE = 1;
-            AD = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AG = 0;
+            AE = 0;
+            AD = 0;
             break;
         case(3):
-            AA1 = 1;
-            AB2 = 1;
-            AG = 1;
-            AC3 = 1;
-            AD = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AG = 0;
+            AC3 = 0;
+            AD = 0;
             break;
         case(4):
-            AF = 1;
-            AG = 1;
-            AB2 = 1;
-            AC3 = 1;
+            AF = 0;
+            AG = 0;
+            AB2 = 0;
+            AC3 = 0;
             break;
         case(5):
-            AA1 = 1;
-            AF = 1;
-            AG = 1;
-            AC3 = 1;
-            AD = 1;
+            AA1 = 0;
+            AF = 0;
+            AG = 0;
+            AC3 = 0;
+            AD = 0;
             break;
         case(6):
-            AA1 = 1;
-            AF = 1;
-            AG = 1;
-            AC3 = 1;
-            AD = 1;
-            AE = 1;
+            AA1 = 0;
+            AF = 0;
+            AG = 0;
+            AC3 = 0;
+            AD = 0;
+            AE = 0;
             break;
         case(7):
-            AA1 = 1;
-            AB2 = 1;
-            AC3 = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AC3 = 0;
             break;
         case(8):
-            AA1 = 1;
-            AB2 = 1;
-            AC3 = 1;
-            AD = 1;
-            AE = 1;
-            AF = 1;
-            AG = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AC3 = 0;
+            AD = 0;
+            AE = 0;
+            AF = 0;
+            AG = 0;
             break;
         case(9):
-            AA1 = 1;
-            AB2 = 1;
-            AC3 = 1;
-            AD = 1;
-            AF = 1;
-            AG = 1;
+            AA1 = 0;
+            AB2 = 0;
+            AC3 = 0;
+            AD = 0;
+            AF = 0;
+            AG = 0;
             break;
         case(10):
             if( (dots&0b01) == 1) {
-                AA1 = 1;
+                AA1 = 0;
             }
             if( ((dots>>1) & 0b01) == 1) {
-                AB2 = 1;
+                AB2 = 0;
             }
             if( ((dots>>2) & 0b01) == 1) {
-                AC3 = 1;
+                AC3 = 0;
             }
             break;
     }
@@ -171,32 +171,33 @@ unsigned char lcd_display(char digit, int value, char dots) {
 
     if(digit == 0) {   //K1, most significant digit
         if( ((dots>>3) & 0b01) == 1) {
-            ADP = 1;
+            ADP = 0;
         }
-        K1 = 0;
+        K1 = 1;
     } else if(digit == 1) { //K2
         if( ((dots>>4) & 0b01) == 1) {
-            ADP = 1;
+            ADP = 0;
         }
-        K2 = 0;
+        K2 = 1;
     } else if(digit == 2) { //K4
         if( ((dots>>5) & 0b01) == 1) {
-            ADP = 1;
+            ADP = 0;
         }
-        K4 = 0;
+        K3 = 1;
     } else if(digit == 3) { //K5
         if( ((dots>>6) & 0b01) == 1) {
-            ADP = 1;
+            ADP = 0;
         }
-        K5 = 0;
+        K4 = 1;
     } else { //dots (K3)
-        K3 = 0;
+        K5 = 1;
     }
 
     
+    Nop();
+    Nop();
 
 
 
-
-	return 0; /*! \return 0 = success */
+    return 0; /*! \return 0 = success */
 }

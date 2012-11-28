@@ -44,7 +44,7 @@
 /** @defgroup TIMER_DEFS Timer Definitions
  * @{ */
 #define TIMER2_ON		T2CONbits.TON
-#define TIMER2_PERIOD 	800   //3200 = 12.5KHz 1600 = 25KHz, 800 = 50KHz, 500 = 80KHz, 640 = 62.5Khz
+#define TIMER2_PERIOD 	200   //3200 = 12.5KHz 1600 = 25KHz, 800 = 50KHz, 500 = 80KHz, 640 = 62.5Khz
 /** @} */
 
 // R1 Response Codes (from SD Card Product Manual v1.9 section 5.2.3.1)
@@ -70,6 +70,16 @@
 #define START_BLOCK_TIMEOUT     10000   ///CMD17 start block timeout
 #define MULTI_TOKEN_TIMEOUT     1000    ///CMD24 receive token timeout
 #define PRE_ERASE_TIMEOUT       1000	///CMD55 pre-erase timeout
+/** @} */
+
+
+/** @defgroup ADC_DEFS ADC Definitions
+ * @{ */
+#define T2_DIR TRISBbits.TRISB5
+#define T1_DIR TRISBbits.TRISB4
+#define T0_DIR TRISBbits.TRISB3
+
+
 /** @} */
 
 

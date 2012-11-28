@@ -63,12 +63,49 @@ void __attribute__((__interrupt__, auto_psv)) _DMA0Interrupt(void)
     return;
     
 }
+
+
+/*! \brief DMA1 ISR - formats ADC sample and writes it to memory
+ *
+ *	_DMA0Interrupt() is the DMA channel 0 interrupt service routine (ISR). DMA is used to retrieve information from the ADC DMA buffer. Since the ADC requires an external clock (which it gets from the SPI2 clock) it would require too much of the cpu's time to wait for the SPI clock to complete the transfer. The TIMER2 interrupt starts the DMA transfer. This function takes the information in stored in the buffer, formats it, and stores it in the global variable 'sample' where it is processed by the timer2 ISR. This introduces a 1 sample "lag" in the record.
+ *
+ */
+
+void __attribute__((__interrupt__)) _DMA1Interrupt(void);
+void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
+{
+    unsigned int adc_accum = 0;
+    LED3 = 1;
+    LED4 = 1;
+    adc_accum += *(&dma_adc_buf);
+    adc_accum += *(&dma_adc_buf+1);
+    adc_accum += *(&dma_adc_buf+2);
+    adc_accum += *(&dma_adc_buf+3);
+    adc_accum += *(&dma_adc_buf+4);
+    adc_accum += *(&dma_adc_buf+5);
+    adc_accum += *(&dma_adc_buf+6);
+    adc_accum += *(&dma_adc_buf+7);
+    adc_accum += *(&dma_adc_buf+8);
+    adc_accum += *(&dma_adc_buf+9);
+    adc_accum += *(&dma_adc_buf+10);
+    adc_accum += *(&dma_adc_buf+11);
+    adc_accum += *(&dma_adc_buf+12);
+    adc_accum += *(&dma_adc_buf+13);
+    adc_accum += *(&dma_adc_buf+14);
+    adc_accum += *(&dma_adc_buf+15);
     
+    LCD_value = adc_accum >> 4; //divide by 16 to get the average
 
 
-/*! \brief Interrupt Service Routine - reads from ADC and writes to buffer
+    DMA1_FLAG = 0;
+    return;
+
+}
+
+
+/*! \brief Interrupt Service Routine - updates LCD based on global variables
  *         
- *	_T1Interrupt() is the TIMER2 interrupt service routine (ISR). This interrupt occurs service routine is set to interrupt on the overflow of Timer2. (50KHz). It retrieves a 16bit sample from the ADC and writes the sample to the active buffer. If the active buffer is full, the buffer pointer is directed towards to alternate buffer and the write_flag is set.
+ *	_T2Interrupt() is the TIMER2 interrupt service routine (ISR). This interrupt occurs service routine is set to interrupt on the overflow of Timer2.  It updates the display based on the global variables "LCD_value", "LCD_dots", and "LCD_digit". It increments the digit variable.
  *  
  */
 	
@@ -76,10 +113,10 @@ void __attribute__((__interrupt__, auto_psv)) _DMA0Interrupt(void)
 void __attribute__((__interrupt__)) _T2Interrupt(void);
 void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
 {
-    unsigned long address_state;
-    unsigned char CE_state, OE_state;
-
-    LED3 = LED3 ^ 1;
+    LCD_digit = (LCD_digit + 1) % 5;
+    lcd_display(LCD_digit, LCD_value, LCD_dots);
+ 
+    
     TMR2_FLAG = 0;
     return;
 }
@@ -102,11 +139,30 @@ int main (void) {
     unsigned char sd_attempt = 0;
     unsigned long mem_address = 0;
     unsigned char inc = 0;
-	
-    Nop(); 
-    init();
+    unsigned char digit_inc = 0;
+    unsigned int count = 0;
 
-	 
+    LCD_value = 1234;
+    init();
+    LED3 = 1; 
+    T2CONbits.TON = 1;
+    AD1CON1bits.SAMP = 1; //start converting
+    *(&dma_adc_buf) = 5; 
+    while(1==1){
+        count++;
+        if(count == 10000) {
+            count = 0;
+        }
+        //LCD_value = count;
+        LCD_dots = 0b00100000;
+        __delay_ms(10);
+
+    }
+
+
+
+
+
     sd_address = SD_START_ADDRESS; /* the writing starts a few kb into the sd card to leave room for housekeeping */
     LED3 = 1;
     __delay_ms(200);

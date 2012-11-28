@@ -10,12 +10,21 @@
 
 #define FCY 40000000UL ///40 MIPS operating speed (used for __delay_ms() and __delay_S())
 
-/** @defgroup MISC_PINS Misc Pins
+/** @defgroup LEDS LEDS
  * @{ */
+#define T0_LED      LATCbits.LATC1
+#define T0_LED_DIR  TRISCbits.TRISC1
+#define T1_LED      LATCbits.LATC2
+#define T1_LED_DIR  TRISCbits.TRISC2
+#define T2_LED      LATCbits.LATC3
+#define T2_LED_DIR  TRISCbits.TRISC3
 #define LED3        LATDbits.LATD12
 #define LED3_DIR    TRISDbits.TRISD12
 #define LED4        LATDbits.LATD13
 #define LED4_DIR    TRISDbits.TRISD13
+#define LED6        LATCbits.LATC4
+#define LED6_DIR     TRISCbits.TRISC4
+
 /** @} */
 
 /** @defgroup SD_PINS SD Pins
@@ -79,7 +88,20 @@
 #define T1_DIR TRISBbits.TRISB4
 #define T0_DIR TRISBbits.TRISB3
 
+/** @} */
 
+/** @defgroup SWITCHES Switches
+ * @{ */
+#define SW_SEL_DIR      TRISEbits.TRISE1
+#define SW_SEL          PORTEbits.RE1
+#define SW_SET_DIR      TRISEbits.TRISE2
+#define SW_SET          PORTEbits.RE2
+#define SW_ENC_A_DIR    TRISGbits.TRISG12
+#define SW_ENC_A        PORTGbits.RG12
+#define SW_ENC_B_DIR    TRISGbits.TRISG14
+#define SW_ENC_B        PORTGbits.RG14
+#define SW_ENC_PUSH_DIR TRISGbits.TRISG13
+#define SW_ENC_PUSH     PORTGbits.RG13
 /** @} */
 
 

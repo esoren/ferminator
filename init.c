@@ -43,8 +43,21 @@ void init(void) {
     LATG  = 0x0000;
  	
     //SETUP INDIVIDUAL IO PINS
+    LED3 = 0;
+    LED4 = 0;
+    LED6 = 0;
+    T0_LED = 0;
+    T1_LED = 0;
+    T2_LED = 0;
     LED3_DIR = 0; //set debug leds as output
     LED4_DIR = 0;
+    LED6_DIR = 0;
+    T0_LED_DIR = 0;
+    T1_LED_DIR = 0;
+    T2_LED_DIR = 0;
+
+
+
  
     //SD pins
     SDO1_PIN_DIR = 0; //SDO1 as output
@@ -84,6 +97,13 @@ void init(void) {
     ADP_DIR = 0;
 
    
+    //INPUT PINS
+    SW_SEL_DIR      = 1;
+    SW_SET_DIR      = 1;
+    SW_ENC_A_DIR    = 1;
+    SW_ENC_B_DIR    = 1;
+    SW_ENC_PUSH_DIR = 1;
+    
 
 
     //setup pins AN0-AN11 as digital IO
@@ -137,7 +157,6 @@ void init(void) {
     AD1CON1bits.ADDMABM = 1; //write buffer sequentially
     AD1CON2bits.SMPI = 0xF; //interrupt every sixteen conversions
     AD1CON2bits.BUFM = 0; //always start at beginning of buffer
-
 
 
 

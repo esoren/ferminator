@@ -18,3 +18,6 @@ unsigned volatile long head = 0; ///write position of the buffer (where the next
 unsigned volatile long tail = 0; ///read position of the buffer (where the samples are read out of the buffer and sent to the sd card)
 unsigned int dma_adc_buf[16] __attribute__((space(dma))); //space in DMA memory to hold the ADC results
 //unsigned char dma_dummy  __attribute__((space(dma))) = 0xFF; //dummy variable for clocking the DMA module
+unsigned int T0_temp = 0;
+unsigned int T1_temp = 0;
+unsigned int T2_temp = 0;

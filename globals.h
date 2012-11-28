@@ -14,5 +14,8 @@ extern volatile unsigned long tail;
 //extern int num_of_params;
 extern unsigned int dma_adc_buf __attribute__((space(dma)));
 //extern unsigned char dma_dummy __attribute__((space(dma)));
+extern unsigned int T0_temp;
+extern unsigned int T1_temp;
+extern unsigned int T2_temp;
 #endif
 

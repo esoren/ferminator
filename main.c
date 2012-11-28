@@ -11,6 +11,7 @@
 #include "spi_sd.h"
 #include "globals.h"
 #include "init.h"
+#include "temp_lookup.h"
 #include <libpic30.h> //for delays
 
 /* CONFIG SETTINGS  */
@@ -75,6 +76,14 @@ void __attribute__((__interrupt__)) _DMA1Interrupt(void);
 void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
 {
     unsigned int adc_accum = 0;
+    unsigned int lookup_count = 0;
+    unsigned int lcd_value_rounded = 0;
+    unsigned int adc_high = 0;
+    unsigned int adc_low = 0;
+    unsigned int range = 0;
+    unsigned int decimal = 0;
+    unsigned int fraction = 0;
+
     LED3 = 1;
     LED4 = 1;
     adc_accum += *(&dma_adc_buf);
@@ -93,10 +102,25 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
     adc_accum += *(&dma_adc_buf+13);
     adc_accum += *(&dma_adc_buf+14);
     adc_accum += *(&dma_adc_buf+15);
+
+    while(adc_accum < *(&lookup_adc_0+lookup_count) && lookup_count < LOOKUP_0_LENGTH) {
+        lookup_count++;
+    }
+
+    lcd_value_rounded = (int)(*(&lookup_temp_0+lookup_count)*10);
+
+    adc_high = (int)(*(&lookup_adc_0+lookup_count-1));
+    adc_low = (int)(*(&lookup_adc_0+lookup_count));
+
+    range = adc_high - adc_low;
+    fraction = 10*(adc_accum - adc_low);
+    fraction = fraction / range;
+
+    fraction = 9 - fraction;
+    lcd_value_rounded += fraction;
+
     
-    LCD_value = adc_accum >> 4; //divide by 16 to get the average
-
-
+    T2_temp = lcd_value_rounded;
     DMA1_FLAG = 0;
     return;
 
@@ -141,23 +165,56 @@ int main (void) {
     unsigned char inc = 0;
     unsigned char digit_inc = 0;
     unsigned int count = 0;
+    unsigned char input_sensor = 2; 
 
     LCD_value = 1234;
     init();
     LED3 = 1; 
     T2CONbits.TON = 1;
     AD1CON1bits.SAMP = 1; //start converting
-    *(&dma_adc_buf) = 5; 
+    LCD_dots = 0b00100000;
+    T2_LED = 1;
+
     while(1==1){
-        count++;
-        if(count == 10000) {
-            count = 0;
+        if(SW_SET == 0) {
+            input_sensor = (input_sensor + 4) % 3;
+            T0_LED = 0;
+            T1_LED = 0;
+            T2_LED = 0;
+            switch(input_sensor){
+                case 0:
+                    T0_LED = 1;
+                    break;
+                case 1:
+                    T1_LED = 1;
+                    break;
+                case 2:
+                    T2_LED = 1;
+                    break;
+            }
+            __delay_ms(250);
         }
-        //LCD_value = count;
-        LCD_dots = 0b00100000;
-        __delay_ms(10);
+
+        switch(input_sensor){
+                case 0:
+                    T0_LED = 1;
+                    LCD_value = T0_temp;
+                    break;
+                case 1:
+                    T1_LED = 1;
+                    LCD_value = T1_temp;
+                    break;
+                case 2:
+                    T2_LED = 1;
+                    LCD_value = T2_temp;
+                    break;
+            }
 
     }
+
+       
+
+    
 
 
 

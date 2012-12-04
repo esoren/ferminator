@@ -103,25 +103,56 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
     adc_accum += *(&dma_adc_buf+14);
     adc_accum += *(&dma_adc_buf+15);
 
-    while(adc_accum < *(&lookup_adc_0+lookup_count) && lookup_count < LOOKUP_0_LENGTH) {
-        lookup_count++;
+    if(ADC_SOURCE == T1_AN || ADC_SOURCE == T2_AN) {
+        while(adc_accum < *(&lookup_adc_0+lookup_count) && lookup_count < LOOKUP_0_LENGTH) {
+            lookup_count++;
+        }
+        lcd_value_rounded = (int)(*(&lookup_temp_0+lookup_count)*10);
+        adc_high = (int)(*(&lookup_adc_0+lookup_count-1));
+        adc_low = (int)(*(&lookup_adc_0+lookup_count));
+        range = adc_high - adc_low;
+        fraction = 10*(adc_accum - adc_low);
+        fraction = fraction / range;
+        fraction = 9 - fraction;
+        lcd_value_rounded += fraction;
+    } else {
+        //thermocouple
+
+        fraction =  (20000*(long)adc_accum)/((long)65535);
+        fraction = fraction >> 2;
+        Nop();
+        Nop();
+        lcd_value_rounded = fraction; 
+
     }
 
-    lcd_value_rounded = (int)(*(&lookup_temp_0+lookup_count)*10);
 
-    adc_high = (int)(*(&lookup_adc_0+lookup_count-1));
-    adc_low = (int)(*(&lookup_adc_0+lookup_count));
 
-    range = adc_high - adc_low;
-    fraction = 10*(adc_accum - adc_low);
-    fraction = fraction / range;
-
-    fraction = 9 - fraction;
-    lcd_value_rounded += fraction;
-
+    switch(ADC_SOURCE) {
+        case T0_AN:
+            T0_temp = lcd_value_rounded;
+            ADC_SOURCE = T1_AN;
+            break;
+        case T1_AN:
+            T1_temp = lcd_value_rounded;
+            ADC_SOURCE = T2_AN;
+            break;
+        case T2_AN:
+            T2_temp = lcd_value_rounded;
+            ADC_SOURCE = T0_AN;
+            break;
+    }
+        
     
-    T2_temp = lcd_value_rounded;
+
+
+
+
+
     DMA1_FLAG = 0;
+
+
+
     return;
 
 }
@@ -175,7 +206,12 @@ int main (void) {
     LCD_dots = 0b00100000;
     T2_LED = 1;
 
+    HEATER1 = 1; //turn on heater 1
+    AD1CHS0bits.CH0SA = 3;
+    
     while(1==1){
+      
+        
         if(SW_SET == 0) {
             input_sensor = (input_sensor + 4) % 3;
             T0_LED = 0;
@@ -196,19 +232,19 @@ int main (void) {
         }
 
         switch(input_sensor){
-                case 0:
-                    T0_LED = 1;
-                    LCD_value = T0_temp;
-                    break;
-                case 1:
-                    T1_LED = 1;
-                    LCD_value = T1_temp;
-                    break;
-                case 2:
-                    T2_LED = 1;
-                    LCD_value = T2_temp;
-                    break;
-            }
+            case 0:
+                T0_LED = 1;
+                LCD_value = T0_temp;
+                break;
+            case 1:
+                T1_LED = 1;
+                LCD_value = T1_temp;
+                break;
+            case 2:
+                T2_LED = 1;
+                LCD_value = T2_temp;
+                break;
+        }
 
     }
 

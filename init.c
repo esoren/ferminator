@@ -105,6 +105,12 @@ void init(void) {
     SW_ENC_PUSH_DIR = 1;
     
 
+    //HEATER SETUP
+    HEATER1 = 0;
+    HEATER2 = 0;
+    HEATER1_DIR = 0; //output
+    HEATER2_DIR = 0; //output
+
 
     //setup pins AN0-AN11 as digital IO
     AD1PCFGL = 0xFFFF;
@@ -149,15 +155,14 @@ void init(void) {
     AD1CON1bits.FORM = 00; //store results as unsigned integer
     AD1CON2bits.CHPS = 00; //only sample channel 0;
     AD1CON3bits.ADCS = 0x3F; //T_AD = TCY * 64   (CHECK THIS LATER, T_AD should be > 117.6ns)
-    AD1CHS0bits.CH0SA = 5; //select 5 (T2)
-    AD1CON3bits.SAMC = 3; //14 TAD in a conversion
+    AD1CON3bits.SAMC = 14; //14 TAD in a conversion
     AD1CON4bits.DMABL = 0b100; //16 words of buffer for each input
     AD1CON2bits.ALTS = 0; //always sample on MUXA
     AD1CON1bits.ASAM = 1; //autosample
     AD1CON1bits.ADDMABM = 1; //write buffer sequentially
     AD1CON2bits.SMPI = 0xF; //interrupt every sixteen conversions
     AD1CON2bits.BUFM = 0; //always start at beginning of buffer
-
+    ADC_SOURCE = T2_AN; //select T2
 
 
     //DMA Setup

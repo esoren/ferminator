@@ -41,6 +41,15 @@
 #define CS1_PIN_DIR	TRISGbits.TRISG3
 /** @} */
 
+/** @defgroup HEATER_PINS HEATER Pins
+ * @{ */
+#define HEATER1_DIR     TRISEbits.TRISE3
+#define HEATER1         LATEbits.LATE3
+#define HEATER2_DIR     TRISEbits.TRISE4
+#define HEATER2         LATEbits.LATE4
+
+/** @} */
+
 
 /** @defgroup ERROR_DEFS Error Definitions
  * @{ */
@@ -87,6 +96,11 @@
 #define T2_DIR TRISBbits.TRISB5
 #define T1_DIR TRISBbits.TRISB4
 #define T0_DIR TRISBbits.TRISB3
+#define T0_AN  3
+#define T1_AN  4
+#define T2_AN  5
+#define ADC_SOURCE  AD1CHS0bits.CH0SA
+
 
 /** @} */
 

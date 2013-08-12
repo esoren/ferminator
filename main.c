@@ -212,7 +212,7 @@ int main (void) {
     while(1==1){
       
         
-        if(SW_SET == 0) {
+        if(SW_SEL == 0) {
             input_sensor = (input_sensor + 4) % 3;
             T0_LED = 0;
             T1_LED = 0;

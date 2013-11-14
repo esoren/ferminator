@@ -13,7 +13,7 @@
 /*! \brief Initializes ports and peripherals
  *
  *	Initializes all IO ports on the device (default to inputs) as well as peripherals including SPI, PPS, Interrupts, and Timers.
- *
+ *      Git Test
  */
 
 void init(void) {

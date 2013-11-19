@@ -31,7 +31,7 @@ void error(unsigned int error_num);
  *         
  *	A debugging function which halts the operation of the sensor (endless while-loop) and blinks DEBUG_LEDs 3 and 4. 
  *  You can tell the specific error number according to the ratio LED3:LED4 blinks. For instance, if LED3 blinks three 
- *  times every time LED4 blinks once then the error_num is 3 (BUFFER_OVERFLOW).
+ *  times every time LED4 blinks once then the error_num is 3.
  */
 
 void error(unsigned int error_num) {
@@ -52,7 +52,14 @@ void error(unsigned int error_num) {
 
 /*! \brief DMA0 ISR - formats ADC sample and writes it to memory
  *
- *	_DMA0Interrupt() is the DMA channel 0 interrupt service routine (ISR). DMA is used to retrieve information from the ADC DMA buffer. Since the ADC requires an external clock (which it gets from the SPI2 clock) it would require too much of the cpu's time to wait for the SPI clock to complete the transfer. The TIMER2 interrupt starts the DMA transfer. This function takes the information in stored in the buffer, formats it, and stores it in the global variable 'sample' where it is processed by the timer2 ISR. This introduces a 1 sample "lag" in the record.
+ *	_DMA0Interrupt() is the DMA channel 0 interrupt service routine (ISR).
+ *      DMA is used to retrieve information from the ADC DMA buffer. Since the
+ *      ADC requires an external clock (which it gets from the SPI2 clock) it
+ *      would require too much of the cpu's time to wait for the SPI clock to
+ *      complete the transfer. The TIMER2 interrupt starts the DMA transfer.
+ *      This function takes the information in stored in the buffer, formats it,
+ *      and stores it in the global variable 'sample' where it is processed by
+ *      the timer2 ISR. This introduces a 1 sample "lag" in the record.
  *
  */
 

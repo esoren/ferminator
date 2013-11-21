@@ -1840,6 +1840,7 @@
 <circle x="95.54" y="19.35" radius="0.23" width="0.4064" layer="25"/>
 <circle x="68.76" y="54.5" radius="0.123690625" width="0.4064" layer="25"/>
 <circle x="39.05" y="36.79" radius="0.21954375" width="0.4064" layer="25"/>
+<circle x="18.37" y="46" radius="0.183846875" width="0.4064" layer="25"/>
 </plain>
 <libraries>
 <library name="rcl">

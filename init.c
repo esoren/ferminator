@@ -9,6 +9,7 @@
 #include <p33FJ256GP510A.h>
 #include "defs.h"
 #include "globals.h"
+#include <i2c.h>
 
 /*! \brief Initializes ports and peripherals
  *
@@ -17,7 +18,8 @@
  */
 
 void init(void) {
-
+    
+    
     //The following two instructions set the device clock (Fosc) to 80Mhz when the external clock is 16Mhz.
     CLKDIV = 0x0000; //Doze clock 1:1, Doze disabled, PLL N2 = 2, PLL N1 = 2
     PLLFBD = 0x0012; //M = 20
@@ -96,7 +98,9 @@ void init(void) {
     AG_DIR = 0;
     ADP_DIR = 0;
 
-   
+    PMD2bits.OC8MD = 0;
+    CNPU2bits.CN16PUE = 0;
+
     //INPUT PINS
     SW_SEL_DIR      = 1;
     SW_SET_DIR      = 1;
@@ -184,7 +188,7 @@ void init(void) {
     AD1CON1bits.ADON = 1; //turn on the ADC module
     DMA1CONbits.CHEN = 1;
 
-
+    
 
     
 

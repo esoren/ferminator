@@ -12,6 +12,7 @@
 #include "globals.h"
 #include "init.h"
 #include "temp_lookup.h"
+#include <i2c.h>
 #include <libpic30.h> //for delays
 
 /* CONFIG SETTINGS  */
@@ -194,7 +195,8 @@ void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
  */
 
 int main (void) {
-    
+    unsigned int config2, config1;
+    unsigned char i2c_val;
     unsigned char command = 0;
     unsigned char status = 0;
     unsigned char sd_state = 0;
@@ -205,7 +207,7 @@ int main (void) {
     unsigned int count = 0;
     unsigned char input_sensor = 2; 
 
-    LCD_value = 1234;
+    LCD_value = 0000;
     init();
     LED3 = 1; 
     T2CONbits.TON = 1;
@@ -215,7 +217,71 @@ int main (void) {
 
     HEATER1 = 1; //turn on heater 1
     AD1CHS0bits.CH0SA = 3;
-    
+
+
+
+    //I2C SETUP
+    config2 = 0x11;
+    /* Configure I2C for 7 bit address mode */
+    config1 = ( I2C2_ON &
+                I2C2_IDLE_CON &
+                I2C2_CLK_HLD &
+                I2C2_IPMI_DIS &
+                I2C2_7BIT_ADD &
+                I2C2_SLW_EN &
+                I2C2_SM_DIS &
+                I2C2_GCALL_DIS &
+                I2C2_STR_DIS &
+                I2C2_NACK &
+                I2C2_ACK_DIS &
+                I2C2_RCV_DIS &
+                I2C2_STOP_DIS &
+                I2C2_RESTART_DIS &
+                I2C2_START_DIS);
+
+    OpenI2C2(config1,config2);
+    IdleI2C2();
+    StartI2C2();
+    /* Wait till Start sequence is completed */
+
+    I2C2ADD = 0xd0; //set device address
+    while(I2C2CONbits.SEN);
+
+    IFS3bits.MI2C2IF = 0; //clear interrupt
+  /* Write Slave address and set master for transmission */
+
+    MasterWriteI2C2(0xD0);
+    while(I2C2STATbits.TBF);  // 8 clock cycles
+    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
+    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
+    while(I2CSTATbits.ACKSTAT);
+
+    MasterWriteI2C2(0x0F);
+    while(I2C2STATbits.TBF);  // 8 clock cycles
+    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
+    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
+    while(I2CSTATbits.ACKSTAT);
+
+    MasterWriteI2C2(0xD1);
+    while(I2C2STATbits.TBF);  // 8 clock cycles
+    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
+    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
+    while(I2CSTATbits.ACKSTAT);
+
+
+    I2C2STATbits.RBF = 0; // receive buffer not full
+    i2c_val = MasterReadI2C2();
+
+
+
+    StopI2C2();
+  /* Wait till stop sequence is completed */
+    while(I2CCONbits.PEN);
+    CloseI2C2();
+
+
+
+
     while(1==1){
       
         
@@ -242,6 +308,7 @@ int main (void) {
             case 0:
                 T0_LED = 1;
                 LCD_value = T0_temp;
+
                 break;
             case 1:
                 T1_LED = 1;
@@ -252,6 +319,7 @@ int main (void) {
                 LCD_value = T2_temp;
                 break;
         }
+        
 
     }
 

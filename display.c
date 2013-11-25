@@ -165,7 +165,7 @@ unsigned char lcd_display(char digit, int value, char dots) {
             break;
     }
 
-
+    
 
     //add the dp's, then turn on the individual display
 
@@ -192,6 +192,7 @@ unsigned char lcd_display(char digit, int value, char dots) {
     } else { //dots (K3)
         K5 = 1;
     }
+
 
     
     Nop();

@@ -220,64 +220,85 @@ int main (void) {
 
 
 
-    //I2C SETUP
-    config2 = 0x11;
-    /* Configure I2C for 7 bit address mode */
-    config1 = ( I2C2_ON &
-                I2C2_IDLE_CON &
-                I2C2_CLK_HLD &
-                I2C2_IPMI_DIS &
-                I2C2_7BIT_ADD &
-                I2C2_SLW_EN &
-                I2C2_SM_DIS &
-                I2C2_GCALL_DIS &
-                I2C2_STR_DIS &
-                I2C2_NACK &
-                I2C2_ACK_DIS &
-                I2C2_RCV_DIS &
-                I2C2_STOP_DIS &
-                I2C2_RESTART_DIS &
-                I2C2_START_DIS);
+    /*Set I2C Baud Rate */
+    /*Note: from dsPIC33F Family Reference Manual: I2C, section 19.4.3
+    Baud rate is set according to the following equation:
+    I2CBRG = (FCY/FSCL - FCY/10000000)-1   */
 
-    OpenI2C2(config1,config2);
-    IdleI2C2();
-    StartI2C2();
-    /* Wait till Start sequence is completed */
-
-    I2C2ADD = 0xd0; //set device address
-    while(I2C2CONbits.SEN);
-
-    IFS3bits.MI2C2IF = 0; //clear interrupt
-  /* Write Slave address and set master for transmission */
-
-    MasterWriteI2C2(0xD0);
-    while(I2C2STATbits.TBF);  // 8 clock cycles
-    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
-    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
-    while(I2CSTATbits.ACKSTAT);
-
-    MasterWriteI2C2(0x0F);
-    while(I2C2STATbits.TBF);  // 8 clock cycles
-    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
-    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
-    while(I2CSTATbits.ACKSTAT);
-
-    MasterWriteI2C2(0xD1);
-    while(I2C2STATbits.TBF);  // 8 clock cycles
-    while(!IFS3bits.MI2C2IF); // Wait for 9th clock cycle
-    IFS3bits.MI2C2IF = 0;     // Clear interrupt flag
-    while(I2CSTATbits.ACKSTAT);
-
-
-    I2C2STATbits.RBF = 0; // receive buffer not full
-    i2c_val = MasterReadI2C2();
+    I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
+    //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
+/*setup I2C Config */
+    I2C2CONbits.I2CEN = 1; //enable I2C
+    I2C2CONbits.I2CSIDL = 0; //continue device operation in idle mode
+    I2C2CONbits.SCLREL = 1; //Release SCLx clock in slave mode
+    I2C2CONbits.IPMIEN = 0; //IPMI enable
+    I2C2CONbits.A10M = 0; //7 bit slave address
+    I2C2CONbits.DISSLW = 1; //slew rate control disabled
+    I2C2CONbits.SMEN = 0; //SMBus Input Levels  (???)
+    I2C2CONbits.GCEN = 0; //general call interrupt in slave mode
+    I2C2CONbits.STREN = 0; //disable clock stretching
+    I2C2CONbits.ACKDT = 0; //send ACK during acknowledge  (1 == ACK, 0 = NACK)
+    I2C2CONbits.ACKEN = 0; //used to initiate ACK sequence
+    I2C2CONbits.RCEN = 0; //receive enable bit
+    I2C2CONbits.PEN = 0; //initiate hardware stop condition
+    I2C2CONbits.RSEN = 0; //repeated start condition enable bit
+    I2C2CONbits.SEN = 0; //Start condition enable bit
 
 
 
-    StopI2C2();
-  /* Wait till stop sequence is completed */
-    while(I2CCONbits.PEN);
-    CloseI2C2();
+    /*begin start condition */
+    while(I2C2STATbits.P == 1); //make sure the bus is idle
+    IFS3bits.MI2C2IF = 0; //clear interrupt flag
+    I2C2CONbits.SEN = 1; //set start event
+    while(IFS3bits.MI2C2IF == 0); //wait for interrupt flag to signify end of start condition
+    /*end start condition */
+
+    /*send device address (r/w cleared) */
+    I2C2TRN = 0xD0; //0xD0 = address & 0xFD for write
+    IFS3bits.MI2C2IF = 0;
+    while(I2C2STATbits.TBF); //wait for data to clock out
+    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
+    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
+
+    /*send slave register address*/
+    I2C2TRN = 0x0F; //status register of RTC
+    IFS3bits.MI2C2IF = 0;
+    while(I2C2STATbits.TBF); //wait for data to clock out
+    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
+    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
+
+    /*initiate a repeated start*/
+    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.6 of dsPIC33 reference manual 12C)
+    I2C2CONbits.RSEN = 1;
+    while(I2C2CONbits.RSEN); //wait for slave to response
+
+    /*send device address (read/write set) */
+    I2C2TRN = 0xD1; //0xD1 = address & 0xFD for write
+    IFS3bits.MI2C2IF = 0;
+    while(I2C2STATbits.TBF); //wait for data to clock out
+    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
+    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
+
+    /*receive data from device*/
+    I2C2CONbits.RCEN = 1; //receive enable (start clocking for slave transfer)
+    while(I2C2CONbits.RCEN); //wait for data  (NOTE: can also consider polling RBF bit here)
+    i2c_val = I2C2RCV;
+
+    /*generate NACK*/
+    IFS3bits.MI2C2IF = 0;
+    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.4 of dsPIC33 reference manual 12C)
+    I2C2CONbits.ACKDT = 1; //set acknowledge for NACK
+    I2C2CONbits.ACKEN = 1;
+    while(IFS3bits.MI2C2IF == 0);
+
+    /*generate stop bus event*/
+    IFS3bits.MI2C2IF = 0;
+    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.5 of dsPIC33 reference manual 12C)
+    I2C2CONbits.PEN = 1;
+    while(IFS3bits.MI2C2IF == 0);
+
+/*done!*/
+
 
 
 

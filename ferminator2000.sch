@@ -33069,6 +33069,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <part name="VDD21" library="supply1" deviceset="VDD" device=""/>
 <part name="R54" library="rcl" deviceset="R-US_" device="R0805" value="10k"/>
 <part name="VDD22" library="supply1" deviceset="VDD" device=""/>
+<part name="C3" library="rcl" deviceset="C-US" device="C0603" value=".1u"/>
+<part name="GND45" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -33361,6 +33363,8 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <attribute name="VALUE" x="470.662" y="29.21" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="VDD22" gate="G$1" x="467.36" y="45.72"/>
+<instance part="C3" gate="G$1" x="535.94" y="30.48"/>
+<instance part="GND45" gate="1" x="535.94" y="12.7"/>
 </instances>
 <busses>
 </busses>
@@ -33520,6 +33524,10 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pinref part="U$5" gate="G$1" pin="VCC"/>
 <pinref part="VDD19" gate="G$1" pin="VDD"/>
 <wire x1="502.92" y1="45.72" x2="502.92" y2="48.26" width="0.1524" layer="91"/>
+<pinref part="C3" gate="G$1" pin="1"/>
+<wire x1="502.92" y1="45.72" x2="535.94" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="535.94" y1="45.72" x2="535.94" y2="33.02" width="0.1524" layer="91"/>
+<junction x="502.92" y="45.72"/>
 </segment>
 <segment>
 <pinref part="VDD21" gate="G$1" pin="VDD"/>
@@ -33749,6 +33757,11 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <pinref part="GND42" gate="1" pin="GND"/>
 <pinref part="U$5" gate="G$1" pin="GND"/>
 <wire x1="502.92" y1="7.62" x2="502.92" y2="10.16" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="2"/>
+<wire x1="535.94" y1="25.4" x2="535.94" y2="15.24" width="0.1524" layer="91"/>
+<pinref part="GND45" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="PGD1" class="0">

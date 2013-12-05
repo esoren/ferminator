@@ -196,7 +196,7 @@ void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
 
 int main (void) {
     unsigned int config2, config1;
-    unsigned char i2c_val;
+    unsigned char i2c_val_main = 1;
     unsigned char command = 0;
     unsigned char status = 0;
     unsigned char sd_state = 0;
@@ -210,7 +210,7 @@ int main (void) {
     LCD_value = 0000;
     init();
     LED3 = 1; 
-    T2CONbits.TON = 1;
+    //T2CONbits.TON = 1;
     AD1CON1bits.SAMP = 1; //start converting
     LCD_dots = 0b00100000;
     T2_LED = 1;
@@ -219,86 +219,65 @@ int main (void) {
     AD1CHS0bits.CH0SA = 3;
 
 
+    while(1==1) {
 
-    /*Set I2C Baud Rate */
-    /*Note: from dsPIC33F Family Reference Manual: I2C, section 19.4.3
-    Baud rate is set according to the following equation:
-    I2CBRG = (FCY/FSCL - FCY/10000000)-1   */
+        StartI2C2();                // begin I2C communications
+        IdleI2C2();
+        MasterWriteI2C2( 0xD0 );          // addresses the chip
+        IdleI2C2();
+        MasterWriteI2C2( 0x01 );          // access register address for minutes
+        IdleI2C2();
+        MasterWriteI2C2( 0b00010010 );    // write value into minutes register
+        IdleI2C2();
+        StopI2C2();                 // stop condition I2C on bus
 
-    I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
-    //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
-/*setup I2C Config */
-    I2C2CONbits.I2CEN = 1; //enable I2C
-    I2C2CONbits.I2CSIDL = 0; //continue device operation in idle mode
-    I2C2CONbits.SCLREL = 1; //Release SCLx clock in slave mode
-    I2C2CONbits.IPMIEN = 0; //IPMI enable
-    I2C2CONbits.A10M = 0; //7 bit slave address
-    I2C2CONbits.DISSLW = 1; //slew rate control disabled
-    I2C2CONbits.SMEN = 0; //SMBus Input Levels  (???)
-    I2C2CONbits.GCEN = 0; //general call interrupt in slave mode
-    I2C2CONbits.STREN = 0; //disable clock stretching
-    I2C2CONbits.ACKDT = 0; //send ACK during acknowledge  (1 == ACK, 0 = NACK)
-    I2C2CONbits.ACKEN = 0; //used to initiate ACK sequence
-    I2C2CONbits.RCEN = 0; //receive enable bit
-    I2C2CONbits.PEN = 0; //initiate hardware stop condition
-    I2C2CONbits.RSEN = 0; //repeated start condition enable bit
-    I2C2CONbits.SEN = 0; //Start condition enable bit
+        StartI2C2();                // begin I2C communications
+        IdleI2C2();
+        MasterWriteI2C2( 0xD0 );          // addresses the chip
+        IdleI2C2();
+        MasterWriteI2C2( 0x03 );          // access register address for day of the week
+        IdleI2C2();
+        MasterWriteI2C2( 0x04 );          // write value into day register
+        IdleI2C2();
+        StopI2C2();                 // stop condition I2C on bus
+
+        StartI2C2();                  // Start condition I2C on bus
+        IdleI2C2();
+        MasterWriteI2C2( 0xD0 );            // addresses the chip
+        IdleI2C2();
+        MasterWriteI2C2( 0x03 );            // write register address
+        IdleI2C2();
+        StopI2C2();                   // Stop condition I2C on bus
+
+        StartI2C2();                  // Start condition I2C on bus
+        IdleI2C2();
+        MasterWriteI2C2( 0xD1 );            // addresses the chip with a read bit
+        IdleI2C2();
+        i2c_val_main = MasterReadI2C2();          // read the value from the RTC and store in result
+        IdleI2C2();
+        NotAckI2C2();                 // Not Acknowledge condition.
+//        IdleI2C2();
+        StopI2C2();                   // Stop condition I2C on bus
+        Nop();
+        Nop();
+        Nop();
+
+    }
+
+  
+
+    while(1==1) {
+        
+        i2c_write_byte(RTC_ADDRESS, RTC_CONTROL, 0x00);
+        i2c_write_byte(RTC_ADDRESS, RTC_A1_SECONDS, 12);
+        i2c_val_main = i2c_read_byte(RTC_A1_SECONDS, RTC_CONTROL);
+        Nop();
+        Nop();
+        Nop();
+    }
 
 
-
-    /*begin start condition */
-    while(I2C2STATbits.P == 1); //make sure the bus is idle
-    IFS3bits.MI2C2IF = 0; //clear interrupt flag
-    I2C2CONbits.SEN = 1; //set start event
-    while(IFS3bits.MI2C2IF == 0); //wait for interrupt flag to signify end of start condition
-    /*end start condition */
-
-    /*send device address (r/w cleared) */
-    I2C2TRN = 0xD0; //0xD0 = address & 0xFD for write
-    IFS3bits.MI2C2IF = 0;
-    while(I2C2STATbits.TBF); //wait for data to clock out
-    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
-    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-
-    /*send slave register address*/
-    I2C2TRN = 0x0F; //status register of RTC
-    IFS3bits.MI2C2IF = 0;
-    while(I2C2STATbits.TBF); //wait for data to clock out
-    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
-    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-
-    /*initiate a repeated start*/
-    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.6 of dsPIC33 reference manual 12C)
-    I2C2CONbits.RSEN = 1;
-    while(I2C2CONbits.RSEN); //wait for slave to response
-
-    /*send device address (read/write set) */
-    I2C2TRN = 0xD1; //0xD1 = address & 0xFD for write
-    IFS3bits.MI2C2IF = 0;
-    while(I2C2STATbits.TBF); //wait for data to clock out
-    //while(I2C2STATbits.MI2C2IF); //wait for the ninth clock cycle
-    while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-
-    /*receive data from device*/
-    I2C2CONbits.RCEN = 1; //receive enable (start clocking for slave transfer)
-    while(I2C2CONbits.RCEN); //wait for data  (NOTE: can also consider polling RBF bit here)
-    i2c_val = I2C2RCV;
-
-    /*generate NACK*/
-    IFS3bits.MI2C2IF = 0;
-    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.4 of dsPIC33 reference manual 12C)
-    I2C2CONbits.ACKDT = 1; //set acknowledge for NACK
-    I2C2CONbits.ACKEN = 1;
-    while(IFS3bits.MI2C2IF == 0);
-
-    /*generate stop bus event*/
-    IFS3bits.MI2C2IF = 0;
-    while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.5 of dsPIC33 reference manual 12C)
-    I2C2CONbits.PEN = 1;
-    while(IFS3bits.MI2C2IF == 0);
-
-/*done!*/
-
+    
 
 
 

@@ -106,10 +106,10 @@
 
 /** @defgroup SWITCHES Switches
  * @{ */
-#define SW_SEL_DIR      TRISEbits.TRISE1
-#define SW_SEL          PORTEbits.RE1
-#define SW_SET_DIR      TRISEbits.TRISE2
-#define SW_SET          PORTEbits.RE2
+#define SW_SEL_DIR      TRISEbits.TRISE2
+#define SW_SEL          PORTEbits.RE2
+#define SW_SET_DIR      TRISEbits.TRISE1
+#define SW_SET          PORTEbits.RE1
 #define SW_ENC_A_DIR    TRISGbits.TRISG12
 #define SW_ENC_A        PORTGbits.RG12
 #define SW_ENC_B_DIR    TRISGbits.TRISG14
@@ -164,6 +164,44 @@
 #define AG_DIR      TRISDbits.TRISD1
 #define ADP         LATDbits.LATD0
 #define ADP_DIR     TRISDbits.TRISD0
+
+/** @} */
+
+
+/** @defgroup RTC_DEFS RTC DEFS
+ * @{ */
+
+#define I2C2_SDA_PIN_DIR    TRISAbits.TRISA2
+#define I2C2_SCL_PIN_DIR    TRISAbits.TRISA3
+#define I2C2_SDA_PIN        LATAbits.LATA2
+#define I2C2_SCL_PIN        LATAbits.LATA3
+
+
+
+#define RTC_ADDRESS     0xD0
+
+#define RTC_SECONDS     0x00
+#define RTC_MINUTES     0x01
+#define RTC_HOUR        0x02
+#define RTC_DAY         0x03
+#define RTC_DATE        0x04
+#define RTC_MONTH       0x05
+#define RTC_YEAR        0x06
+
+#define RTC_A1_SECONDS  0x07
+#define RTC_A1_MINUTES  0x08
+#define RTC_A1_HOUR     0x09
+#define RTC_A1_DAY      0x0A
+#define RTC_A2_MINUTES  0x0B
+#define RTC_A2_HOUR     0x0C
+#define RTC_A2_DAY      0x0D
+
+#define RTC_CONTROL     0x0E
+#define RTC_STATUS      0x0F
+
+#define RTC_AGING       0x10
+#define RTC_TEMP_MSB    0x11
+#define RTC_TEMP_LSB    0x12
 
 /** @} */
 

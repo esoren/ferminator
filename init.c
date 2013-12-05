@@ -18,7 +18,7 @@
  */
 
 void init(void) {
-    
+    unsigned int config1, config2;
     
     //The following two instructions set the device clock (Fosc) to 80Mhz when the external clock is 16Mhz.
     CLKDIV = 0x0000; //Doze clock 1:1, Doze disabled, PLL N2 = 2, PLL N1 = 2
@@ -187,6 +187,55 @@ void init(void) {
 
     AD1CON1bits.ADON = 1; //turn on the ADC module
     DMA1CONbits.CHEN = 1;
+
+    
+    /*Set I2C Baud Rate */
+    /*Note: from dsPIC33F Family Reference Manual: I2C, section 19.4.3
+    Baud rate is set according to the following equation:
+    I2CBRG = (FCY/FSCL - FCY/10000000)-1   */
+
+
+
+//    config2 = 395;
+//    /* Configure I2C for 7 bit address mode */
+//    config1 = (I2C2_ON & I2C2_IDLE_CON & I2C2_CLK_HLD
+//    & I2C2_IPMI_DIS & I2C2_7BIT_ADD
+//    & I2C2_SLW_DIS & I2C2_SM_DIS &
+//    I2C2_GCALL_DIS & I2C2_STR_DIS &
+//    I2C2_NACK & I2C2_ACK_DIS & I2C2_RCV_DIS &
+//    I2C2_STOP_DIS & I2C2_RESTART_DIS
+//    & I2C2_START_DIS);
+//    OpenI2C2(config1,config2);
+//    IdleI2C2();
+//
+    
+    I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
+    //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
+
+    I2C2_SDA_PIN = 0;
+    I2C2_SCL_PIN = 0;
+    I2C2_SDA_PIN_DIR = 0;
+    I2C2_SCL_PIN_DIR = 0;
+
+    /*setup I2C Config */
+
+    
+    I2C2CONbits.I2CSIDL = 0; //continue device operation in idle mode
+    I2C2CONbits.SCLREL = 0; //Release SCLx clock in slave mode
+    I2C2CONbits.IPMIEN = 0; //IPMI enable
+    I2C2CONbits.A10M = 0; //7 bit slave address
+    I2C2CONbits.DISSLW = 1; //slew rate control disabled
+    I2C2CONbits.SMEN = 0; //SMBus Input Levels  (???)
+    I2C2CONbits.GCEN = 0; //general call interrupt in slave mode
+    I2C2CONbits.STREN = 0; //disable clock stretching
+    I2C2CONbits.ACKDT = 0; //send ACK during acknowledge  (1 == ACK, 0 = NACK)
+    I2C2CONbits.ACKEN = 0; //used to initiate ACK sequence
+    I2C2CONbits.RCEN = 0; //receive enable bit
+    I2C2CONbits.PEN = 0; //initiate hardware stop condition
+    I2C2CONbits.RSEN = 0; //repeated start condition enable bit
+    I2C2CONbits.SEN = 0; //Start condition enable bit
+    I2C2CONbits.I2CEN = 1; //enable I2C
+    
 
     
 

@@ -4649,6 +4649,8 @@ Please make sure your boards conform to these design rules.</description>
 <via x="87.53" y="27.62" extent="1-16" drill="0.6"/>
 <wire x1="87.53" y1="27.62" x2="87.24" y2="27.62" width="0.4064" layer="16"/>
 <wire x1="87.24" y1="27.62" x2="87.24" y2="27.51" width="0.4064" layer="16"/>
+<contactref element="U2" pad="2"/>
+<wire x1="20.485" y1="26.82" x2="19.835" y2="26.82" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="PGD1">
 <contactref element="U1" pad="73"/>

@@ -33700,6 +33700,10 @@ Source: http://www.diodes.com/datasheets/ds23001.pdf</description>
 <wire x1="553.72" y1="45.72" x2="553.72" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="-VS"/>
 <wire x1="553.72" y1="50.8" x2="558.8" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="U2" gate="G$1" pin="REF"/>
+<wire x1="558.8" y1="53.34" x2="553.72" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="553.72" y1="53.34" x2="553.72" y2="50.8" width="0.1524" layer="91"/>
+<junction x="553.72" y="50.8"/>
 </segment>
 <segment>
 <pinref part="GND32" gate="1" pin="GND"/>

@@ -112,25 +112,52 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
     adc_accum += *(&dma_adc_buf+15);
 
     if(ADC_SOURCE == T1_AN || ADC_SOURCE == T2_AN) {
+        /*T1_AN and T2_AN are thermistor inputs (100k)*/
+
+        /* Note: the thermistors are currently implemented using a lookup table
+         * with linear interpolation between the steps of the table.
+         *
+         * In the future we can (and should) leverage the power of the dsPic to
+         * calculate the temperature directly.  */
+       
+        /*Navigate the lookup table until we've gone over the ADC reading*/
         while(adc_accum < *(&lookup_adc_0+lookup_count) && lookup_count < LOOKUP_0_LENGTH) {
             lookup_count++;
         }
-        lcd_value_rounded = (int)(*(&lookup_temp_0+lookup_count)*10);
+        lcd_value_rounded = (int)(*(&lookup_temp_0+lookup_count)*10); //lower temperature bound
+
         adc_high = (int)(*(&lookup_adc_0+lookup_count-1));
         adc_low = (int)(*(&lookup_adc_0+lookup_count));
-        range = adc_high - adc_low;
+        range = adc_high - adc_low;  //total range used for linterp
+
         fraction = 10*(adc_accum - adc_low);
         fraction = fraction / range;
-        fraction = 9 - fraction;
-        lcd_value_rounded += fraction;
-    } else {
-        //thermocouple
+        fraction = 9 - fraction; // difference to add for linterp
 
-        fraction =  (20000*(long)adc_accum)/((long)65535);
-        fraction = fraction >> 2;
+        lcd_value_rounded += fraction; //final interpolated data
+
+    } else {
+        /*T0_AN is the thermocouple input*/
+
+        /* According to the AD8495 Datasheet Rev. 3 (pg 14)
+         Tmj    = (Vout - Vref)/(5mV/C)     (Vref = GND = 0V)
+         *      = Vout*200
+         *    Vout = (adc_accum / 16) / 2^16 * 2.5
+         Tmj    = adc_accum / 16 * 2.5 / 2^16 * 200 (* 10 for lcd_val)
+         Tmj    = adc_accum * 312.5 / 2^16
+         *
+         */
+
+
+
+        //fraction =  (20000*(long)adc_accum)/((long)65535);
+        lcd_value_rounded = (3125*(long)adc_accum)>>16;
+        lcd_value_rounded = lcd_value_rounded / 10;
+        
+
         Nop();
         Nop();
-        lcd_value_rounded = fraction; 
+
 
     }
 
@@ -219,70 +246,20 @@ int main (void) {
     AD1CHS0bits.CH0SA = 3;
 
 
-    while(1==1) {
 
-        StartI2C2();                // begin I2C communications
-        IdleI2C2();
-        MasterWriteI2C2( 0xD0 );          // addresses the chip
-        IdleI2C2();
-        MasterWriteI2C2( 0x01 );          // access register address for minutes
-        IdleI2C2();
-        MasterWriteI2C2( 0b00010010 );    // write value into minutes register
-        IdleI2C2();
-        StopI2C2();                 // stop condition I2C on bus
-
-        StartI2C2();                // begin I2C communications
-        IdleI2C2();
-        MasterWriteI2C2( 0xD0 );          // addresses the chip
-        IdleI2C2();
-        MasterWriteI2C2( 0x03 );          // access register address for day of the week
-        IdleI2C2();
-        MasterWriteI2C2( 0x04 );          // write value into day register
-        IdleI2C2();
-        StopI2C2();                 // stop condition I2C on bus
-
-        StartI2C2();                  // Start condition I2C on bus
-        IdleI2C2();
-        MasterWriteI2C2( 0xD0 );            // addresses the chip
-        IdleI2C2();
-        MasterWriteI2C2( 0x03 );            // write register address
-        IdleI2C2();
-        StopI2C2();                   // Stop condition I2C on bus
-
-        StartI2C2();                  // Start condition I2C on bus
-        IdleI2C2();
-        MasterWriteI2C2( 0xD1 );            // addresses the chip with a read bit
-        IdleI2C2();
-        i2c_val_main = MasterReadI2C2();          // read the value from the RTC and store in result
-        IdleI2C2();
-        NotAckI2C2();                 // Not Acknowledge condition.
-//        IdleI2C2();
-        StopI2C2();                   // Stop condition I2C on bus
-        Nop();
-        Nop();
-        Nop();
-
-    }
 
   
 
-    while(1==1) {
+   /* Test the RTC I2C connection*/
         
-        i2c_write_byte(RTC_ADDRESS, RTC_CONTROL, 0x00);
-        i2c_write_byte(RTC_ADDRESS, RTC_A1_SECONDS, 12);
-        i2c_val_main = i2c_read_byte(RTC_A1_SECONDS, RTC_CONTROL);
-        Nop();
-        Nop();
-        Nop();
-    }
+   i2c_write_byte(RTC_ADDRESS, RTC_CONTROL, 0x00);
+   i2c_write_byte(RTC_ADDRESS, RTC_A1_SECONDS, 12);
+   i2c_val_main = i2c_read_byte(RTC_A1_SECONDS, RTC_CONTROL);
+   Nop();
+   Nop();
+   Nop();
 
-
-    
-
-
-
-
-    while(1==1){
+   while(1==1){
       
         
         if(SW_SEL == 0) {
@@ -304,11 +281,12 @@ int main (void) {
             __delay_ms(250);
         }
 
+
+
         switch(input_sensor){
             case 0:
                 T0_LED = 1;
                 LCD_value = T0_temp;
-
                 break;
             case 1:
                 T1_LED = 1;

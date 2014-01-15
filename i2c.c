@@ -23,24 +23,22 @@ unsigned char i2c_read_byte(unsigned char slave_address, unsigned char slave_reg
     I2C2TRN = slave_address & 0xFD;
     IFS3bits.MI2C2IF = 0;
     while(I2C2STATbits.TBF); //wait for data to clock out
-    __delay_us(25);
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
+    IdleI2C2();
 
     /*send slave register address*/
     I2C2TRN = slave_register; //status register of RTC
     IFS3bits.MI2C2IF = 0;
-    __delay_us(25);
     while(I2C2STATbits.TBF); //wait for data to clock out
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
+    IdleI2C2();
 
-
-    
     /*initiate a repeated start*/
-    __delay_us(100);
+    //__delay_us(100);
     while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.6 of dsPIC33 reference manual 12C)
     I2C2CONbits.RSEN = 1;
     while(I2C2CONbits.RSEN); //wait for slave to respond
-    __delay_us(100);
+    //__delay_us(100);
    
   
 
@@ -49,24 +47,15 @@ unsigned char i2c_read_byte(unsigned char slave_address, unsigned char slave_reg
     I2C2TRN = slave_address | 0x1;
     IFS3bits.MI2C2IF = 0;
     while(I2C2STATbits.TBF); //wait for data to clock out
-    __delay_us(25);
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-   
+    IdleI2C2();
+
     /*receive data from device*/
     I2C2CONbits.RCEN = 1; //receive enable (start clocking for slave transfer)
     while(I2C2CONbits.RCEN); //wait for data  (NOTE: can also consider polling RBF bit here)
     i2c_val = I2C2RCV;
-    __delay_us(25);
+    IdleI2C2();
     
-    /*generate NACK*/
-    //IFS3bits.MI2C2IF = 0;
-    //while(I2C2CON & 0x001F); //wait for the module to be ready (see 19.5.4 of dsPIC33 reference manual 12C)
-    //I2C2CONbits.ACKDT = 1; //set acknowledge for NACK
-    //I2C2CONbits.ACKEN = 1;
-    //while(IFS3bits.MI2C2IF == 0);
-    //I2C2CONbits.ACKEN = 0;
-    //I2C2CONbits.ACKDT = 0; //set acknowledge for ACK
-
     NotAckI2C2();
     while(I2C2CONbits.ACKEN);
 
@@ -96,21 +85,21 @@ unsigned char i2c_write_byte (unsigned char slave_address, unsigned char slave_r
     IFS3bits.MI2C2IF = 0;
     while(I2C2STATbits.TBF); //wait for data to clock out
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-    __delay_us(25);
+    IdleI2C2();
 
     /*send slave register address*/
     I2C2TRN = slave_register; //status register of RTC
     IFS3bits.MI2C2IF = 0;
     while(I2C2STATbits.TBF); //wait for data to clock out
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-    __delay_us(25);
+    IdleI2C2();
 
     /*send data */
     I2C2TRN = data_out; //status register of RTC
     IFS3bits.MI2C2IF = 0;
     while(I2C2STATbits.TBF); //wait for data to clock out
     while(I2C2STATbits.ACKSTAT); //wait for device to acknowledge
-    __delay_us(25);
+    IdleI2C2();
 
     /*generate stop bus event*/
     IFS3bits.MI2C2IF = 0;

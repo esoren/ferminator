@@ -209,8 +209,8 @@ void init(void) {
 //    IdleI2C2();
 //
     
-    I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
-    //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
+    //I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
+    I2C2BRG = 95; //(400Khz @ 50MHz FCY)
 
     I2C2_SDA_PIN = 0;
     I2C2_SCL_PIN = 0;

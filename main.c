@@ -256,8 +256,8 @@ int main (void) {
 
    /* Test the RTC I2C connection*/
    while(1==1) {
-        //i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x02);
-        __delay_ms(1);
+        i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x03);
+        __delay_us(100);
         i2c_val_main = i2c_read_byte(RTC_ADDRESS, RTC_A1_HOUR);
         Nop();
         Nop();

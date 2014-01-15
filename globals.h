@@ -11,6 +11,7 @@ extern unsigned char *receive_ptr;
 extern unsigned volatile char sync_flag;
 extern volatile unsigned long head;
 extern volatile unsigned long tail;
+extern unsigned char transmit_buffer;
 //extern int num_of_params;
 extern unsigned int dma_adc_buf __attribute__((space(dma)));
 //extern unsigned char dma_dummy __attribute__((space(dma)));

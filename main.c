@@ -12,7 +12,9 @@
 #include "globals.h"
 #include "init.h"
 #include "temp_lookup.h"
+#include "display.h"
 #include <i2c.h>
+#include "i2c.h"
 #include <libpic30.h> //for delays
 
 /* CONFIG SETTINGS  */
@@ -89,7 +91,6 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
     unsigned int adc_high = 0;
     unsigned int adc_low = 0;
     unsigned int range = 0;
-    unsigned int decimal = 0;
     unsigned int fraction = 0;
 
     LED3 = 1;
@@ -233,7 +234,8 @@ int main (void) {
     unsigned char digit_inc = 0;
     unsigned int count = 0;
     unsigned char input_sensor = 2; 
-
+    unsigned char test_val;
+    Nop();
     LCD_value = 0000;
     init();
     LED3 = 1; 
@@ -242,8 +244,10 @@ int main (void) {
     LCD_dots = 0b00100000;
     T2_LED = 1;
 
-    HEATER1 = 1; //turn on heater 1
+    //HEATER1 = 1; //turn on heater 1
     AD1CHS0bits.CH0SA = 3;
+
+
 
 
 
@@ -251,13 +255,14 @@ int main (void) {
   
 
    /* Test the RTC I2C connection*/
-        
-   i2c_write_byte(RTC_ADDRESS, RTC_CONTROL, 0x00);
-   i2c_write_byte(RTC_ADDRESS, RTC_A1_SECONDS, 12);
-   i2c_val_main = i2c_read_byte(RTC_A1_SECONDS, RTC_CONTROL);
-   Nop();
-   Nop();
-   Nop();
+   while(1==1) {
+        //i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x02);
+        __delay_ms(1);
+        i2c_val_main = i2c_read_byte(RTC_ADDRESS, RTC_A1_HOUR);
+        Nop();
+        Nop();
+        Nop();
+   }
 
    while(1==1){
       
@@ -341,28 +346,25 @@ int main (void) {
     LED4 = 0; 
 
     
-    SD_WriteMultiBlockInit(SD_START_ADDRESS); 
+    //SD_WriteMultiBlockInit(SD_START_ADDRESS);
     //SPI1_16bit(1); //turn on 16 bit transfers for increased speed
     TIMER2_ON = 1;
-    
+    sd_address = SD_START_ADDRESS;
      
     while(1==1) {
+
+
 		
-		
-	if((head < tail) || (head >= tail+BLOCK_SIZE)) {
-			status = SD_WriteMultiBlock(tail); 
+	if((head < tail) || (head >= tail+BLOCK_SIZE)) { //CHECK these boundary conditions
+			status = SD_WriteBlock(sd_address, &(transmit_buffer) + tail);
 			tail += 512; 
-			tail &= BUFFER_SIZE-1; 
-			sd_address++; 
+			tail &= BUFFER_SIZE-1;  //wrap around the tail
+			sd_address++; //using SDHC, so each address references a 512 byte block
 		}	
 	}				
     
     
-    //MODEM COMM WAIT LOOP----------
-    while(1==1) {
-     
-       
-    }
+
 	
     return 0;
 }

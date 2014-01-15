@@ -18,7 +18,7 @@
  */
 
 void init(void) {
-    unsigned int config1, config2;
+
     
     //The following two instructions set the device clock (Fosc) to 80Mhz when the external clock is 16Mhz.
     CLKDIV = 0x0000; //Doze clock 1:1, Doze disabled, PLL N2 = 2, PLL N1 = 2

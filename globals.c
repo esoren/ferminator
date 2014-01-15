@@ -11,6 +11,7 @@ unsigned char LCD_dots = 0;
 unsigned int LCD_value = 0;
 unsigned long sd_address = 0; ///current active sd card address
 unsigned char receive_buffer[512];
+unsigned char transmit_buffer[2048];
 unsigned char *receive_ptr = &receive_buffer[0];
 unsigned volatile int sample = 0; /// holds the most recently aquired sample
 unsigned volatile char sync_flag = 0; ///a flag which indicates the ISR should write a sync flag instead of the sample data for a a couple of samples. A nonzero value indicates that is sync event is occuring.

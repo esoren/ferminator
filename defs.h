@@ -76,9 +76,7 @@
 #define R1_ADDRESS_ERROR        (1<<5)  /// A misaligned address, which did not match the block length was used in the command.
 #define R1_PARAMETER            (1<<6)  /// The command's argument (e.g. address, block length) was out of the allowed range for this card.
 #define BLOCK_SIZE              512     ///sd card block size
-#define LOW                     0x0000  ///0x0000
-#define HIGH                    0xFFFF  ///0xFFFF
-#define BUFFER_SIZE             524288  /// size of the circular buffer (= size of SRAM)
+#define BUFFER_SIZE             2048  /// size of the circular buffer
 #define SD_START_ADDRESS        0      	///leave 10 KB at beginning of card for misc. information
 #define CMD0_TIMEOUT            500    	///CMD0 timeout
 #define CMD8_TIMEOUT            500     ///CMD8 timeout

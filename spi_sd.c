@@ -469,7 +469,7 @@ unsigned char SD_WriteMultiBlockInit (unsigned long addr) {
 unsigned char SD_WriteMultiBlock(unsigned long addr) {
     unsigned int inc = 0;
     unsigned char status = 0;
-	unsigned char data;
+
     
     CS1_PIN = 0; //enable SD card
     SPI1Write(0xFC); //send data token

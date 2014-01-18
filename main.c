@@ -235,11 +235,13 @@ int main (void) {
     unsigned int count = 0;
     unsigned char input_sensor = 2; 
     unsigned char test_val;
+    unsigned char hours, minutes, seconds, i2c_buf;
+    unsigned char temp = 0;
     Nop();
     LCD_value = 0000;
     init();
     LED3 = 1; 
-    //T2CONbits.TON = 1;
+    T2CONbits.TON = 1;
     AD1CON1bits.SAMP = 1; //start converting
     LCD_dots = 0b00100000;
     T2_LED = 1;
@@ -249,16 +251,38 @@ int main (void) {
 
 
 
+   //Test write the time (add functionality for this over serial later..)
+    //i2c_write_byte(RTC_ADDRESS, RTC_HOUR, 13);
+    //i2c_write_byte(RTC_ADDRESS, RTC_MINUTES, 0b01010111);
+    //i2c_write_byte(RTC_ADDRESS, RTC_SECONDS, 7);
 
 
 
-  
+   while(1==1) {
+       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
+       minutes = (i2c_buf >>4); //tens digit
+       minutes *= 10;
+       temp = i2c_buf & 0x0F;
+       minutes += temp; //ones digit
+
+       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
+       seconds = (i2c_buf >> 4); //tens digit
+       seconds *= 10;
+       temp = i2c_buf & 0x0F;
+       seconds += temp; //ones digit
+
+       LCD_value = 100*minutes + seconds;
+
+   }
 
    /* Test the RTC I2C connection*/
    while(1==1) {
-        i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x03);
+
+
+
+        //i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x03);
         __delay_us(100);
-        i2c_val_main = i2c_read_byte(RTC_ADDRESS, RTC_A1_HOUR);
+        i2c_val_main = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
         Nop();
         Nop();
         Nop();

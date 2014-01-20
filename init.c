@@ -196,21 +196,10 @@ void init(void) {
 
 
 
-//    config2 = 395;
-//    /* Configure I2C for 7 bit address mode */
-//    config1 = (I2C2_ON & I2C2_IDLE_CON & I2C2_CLK_HLD
-//    & I2C2_IPMI_DIS & I2C2_7BIT_ADD
-//    & I2C2_SLW_DIS & I2C2_SM_DIS &
-//    I2C2_GCALL_DIS & I2C2_STR_DIS &
-//    I2C2_NACK & I2C2_ACK_DIS & I2C2_RCV_DIS &
-//    I2C2_STOP_DIS & I2C2_RESTART_DIS
-//    & I2C2_START_DIS);
-//    OpenI2C2(config1,config2);
-//    IdleI2C2();
-//
     
     I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
     //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
+        //(slightly intermittent results at 400K, need stronger pullups)
 
     I2C2_SDA_PIN = 0;
     I2C2_SCL_PIN = 0;

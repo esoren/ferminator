@@ -96,7 +96,7 @@ unsigned char sd_init_status() {
 	
 	
 	
-	CS1_PIN = 1;  // Turn off SD Card
+    CS1_PIN = 1;  // Turn off SD Card
     for(i=0; i < 20; i++)
         SPI1Write(0xFF); // give SD Card about a hundred clock cycles to boot up
     CS1_PIN = 0;
@@ -106,37 +106,31 @@ unsigned char sd_init_status() {
     //SEND CMD0
     i = 0;
     do {
-        if(i++ > CMD0_TIMEOUT)
-            return 1; /*! \return 1 = CMD0 ERROR (timeout) */
-        
-		
-		CS1_PIN = 1; 
-		SPI1Write(0xFF);
-		CS1_PIN = 0; 
-		SPI1Write(0xFF);
+        if(i++ > CMD0_TIMEOUT) return 1; /*! \return 1 = CMD0 ERROR (timeout) */
+        CS1_PIN = 1; 
+        SPI1Write(0xFF);
+        CS1_PIN = 0;
+        SPI1Write(0xFF);
 
-        if(sd_card_ready() != 1)
-        	return 2; /*! \return 2 = CMD0 ERROR -- sd card not ready */
+        if(sd_card_ready() != 1) return 2; /*! \return 2 = CMD0 ERROR -- sd card not ready */
 		
+            //cmd0 = 0x40 00 00 00 00 95
+            SPI1Write(0x40);
+            SPI1Write(0x00);
+            SPI1Write(0x00);
+            SPI1Write(0x00);
+            SPI1Write(0x00);
+            SPI1Write(0x95);
 		
-		//cmd0 = 0x40 00 00 00 00 95
-		SPI1Write(0x40);
-		SPI1Write(0x00);
-    	SPI1Write(0x00);
-		SPI1Write(0x00);
-		SPI1Write(0x00);
-		SPI1Write(0x95);
-		
-		n = 0;
-		do {
-        	if(n++ > 100)
-				break; //try sending the command again
+            n = 0;
+            do {
+                if(n++ > 100) break; //try sending the command again
+                status = SPI1Read();
+            } while (status == 0xFF); //0xFF is the default response -- wait for something else
 
-        	status = SPI1Read();
-		} while (status == 0xFF); //0xFF is the default response -- wait for something else
-		if(status != 0xFF) {
-			Nop(); Nop(); Nop(); Nop();
-		}	
+            if(status != 0xFF) {
+               Nop(); Nop(); Nop(); Nop();
+            }
 	//at this point we have either received a response or have broken out of the loop after 20 bytes of 0xFF
     } while(status != 0x01); //wait for R1 response
 	
@@ -149,7 +143,7 @@ unsigned char sd_init_status() {
         if(i++ > CMD8_TIMEOUT)
             return 3; /*! \return 3 = CMD8 ERROR (timeout) */
 
-    CS1_PIN = 1;
+        CS1_PIN = 1;
 	SPI1Write(0xFF);
 	CS1_PIN = 0; 
 	SPI1Write(0xFF);
@@ -243,15 +237,13 @@ unsigned char sd_init_status() {
     //command
     i = 0;
     do {
-        if(i++ > ACMD41_CMD55_TIMEOUT) 
-            return 7; /*! \return 7 = ACMD41/CMD55 ERROR (timeout) */
+        if(i++ > ACMD41_CMD55_TIMEOUT) return 7; /*! \return 7 = ACMD41/CMD55 ERROR (timeout) */
 		
 		
 	//Send CMD55 until R1 response 
-		u = 0; 
-		do { 
-            if(u++ > 20)
-				break; //if we aren't getting the response we want from CMD55 break through and try ACMD41 anyway
+	u = 0; 
+	do { 
+            if(u++ > 20) break; //if we aren't getting the response we want from CMD55 break through and try ACMD41 anyway
 
             CS1_PIN = 1;
             SPI1Write(0xFF);
@@ -270,21 +262,18 @@ unsigned char sd_init_status() {
 					
             n = 0;
             do {
-				if(n++ > 20)
-                    break;
-				
-				status = SPI1Read();
-		
+		if(n++ > 20) break;
+		status = SPI1Read();
             } while(status & 0x80);
 			
-		} while(status != 0x01); 
+	} while(status != 0x01); 
 	
 	
-		CS1_PIN = 1; 
-		SPI1Write(0xFF);
-		SPI1Write(0xFF);
-		CS1_PIN = 0; 
-		SPI1Write(0xFF);
+	CS1_PIN = 1; 
+	SPI1Write(0xFF);
+	SPI1Write(0xFF);
+	CS1_PIN = 0; 
+	SPI1Write(0xFF);
 	
         if(sd_card_ready() != 1)
             return 9; /*! \return 9 = ACMD41/CMD55 ERROR (SPI1Wait() timeout 2) */
@@ -293,21 +282,20 @@ unsigned char sd_init_status() {
         //ACMD41
 
     	SPI1Write(0x69);
-		SPI1Write(0x40);
-		SPI1Write(0x00);
-		SPI1Write(0x00);
-		SPI1Write(0x00);
-		SPI1Write(0x01);
+	SPI1Write(0x40);
+	SPI1Write(0x00);
+	SPI1Write(0x00);
+	SPI1Write(0x00);
+	SPI1Write(0x01);
 		
-		n = 0;
-		do {
-        	if(n++ > 20)
-				break; 
-			
-       		status = SPI1Read();
-			
-		} while(status & 0x80); 
-	
+	n = 0;
+	do {
+            if(n++ > 20) break;
+            status = SPI1Read();
+	} while(status & 0x80); 
+        
+        if(status == 0x01) break;
+
     } while(status != 0x00); //the card will return 0x01 until it has exited the idle state. This can take up to 1 second
 
 
@@ -317,7 +305,7 @@ unsigned char sd_init_status() {
     SPI1STATbits.SPIEN = 0; 
     SPI1CON1bits.SPRE = 0b110; //secondary prescaler = 2:1
     SPI1CON1bits.PPRE = 0b11;  //primary prescaler = 1:1
-	SPI1STATbits.SPIEN = 1; 
+    SPI1STATbits.SPIEN = 1;
     
     CS1_PIN = 0; //select the card
 	

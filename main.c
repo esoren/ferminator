@@ -243,7 +243,7 @@ int main (void) {
     LED3 = 1; 
     T2CONbits.TON = 1;
     AD1CON1bits.SAMP = 1; //start converting
-    LCD_dots = 0b00100000;
+    LCD_dots = 0b00000011;
     T2_LED = 1;
 
     //HEATER1 = 1; //turn on heater 1
@@ -258,35 +258,53 @@ int main (void) {
 
 
 
-   while(1==1) {
-       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
-       minutes = (i2c_buf >>4); //tens digit
-       minutes *= 10;
-       temp = i2c_buf & 0x0F;
-       minutes += temp; //ones digit
+//   while(1==1) {
+//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
+//       minutes = (i2c_buf >>4); //tens digit
+//       minutes *= 10;
+//       temp = i2c_buf & 0x0F;
+//       minutes += temp; //ones digit
+//
+//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
+//       seconds = (i2c_buf >> 4); //tens digit
+//       seconds *= 10;
+//       temp = i2c_buf & 0x0F;
+//       seconds += temp; //ones digit
+//
+//       LCD_value = 100*minutes + seconds;
+//
+//   }
 
-       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
-       seconds = (i2c_buf >> 4); //tens digit
-       seconds *= 10;
-       temp = i2c_buf & 0x0F;
-       seconds += temp; //ones digit
-
-       LCD_value = 100*minutes + seconds;
-
-   }
-
-   /* Test the RTC I2C connection*/
-   while(1==1) {
+    sd_address = SD_START_ADDRESS; /* the writing starts a few kb into the sd card to leave room for housekeeping */
+    LED3 = 1;
+    __delay_ms(200);
+    LED4 = 1;
+    __delay_ms(2000); //4 second delay to allow analog stages to stabilize
 
 
+    Nop();
+    Nop();
+    sd_attempt = 0;
+    do {
+        if(++sd_attempt > 3) {
+            error(SD_CARD_NOT_INITIALIZED);  //error();  //critical error - halt the cpu and blink leds.
+	}
+ 	__delay_ms(100); //wait 1 second for SD card to initialize
+        sd_state = sd_init_status(); //returns 0 upon successful init, positive otherwise
 
-        //i2c_write_byte(RTC_ADDRESS, RTC_A1_HOUR, 0x03);
-        __delay_us(100);
-        i2c_val_main = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
-        Nop();
-        Nop();
-        Nop();
-   }
+    } while(sd_state != 0);
+
+    SD_PreEraseBlocks(8); //set the number of blocks to pre-erase to 8. This should increase the multi-block write performance.
+
+    //clear the buf_pos so that we are pointing to the start of the buffer
+   head=tail=0;
+
+
+
+   status = SD_ReadBlock(10000, &receive_buffer);
+
+   LED3 = 1; //inactive state
+   LED4 = 0;
 
    while(1==1){
       
@@ -338,36 +356,7 @@ int main (void) {
 
 
 
-    sd_address = SD_START_ADDRESS; /* the writing starts a few kb into the sd card to leave room for housekeeping */
-    LED3 = 1;
-    __delay_ms(200);
-    LED4 = 1;
-    __delay_ms(4000); //4 second delay to allow analog stages to stabilize
-
-
-    Nop();
-    Nop(); 
-    sd_attempt = 0;
-    do {
-        if(++sd_attempt > 3) {
-            error(SD_CARD_NOT_INITIALIZED);  //error();  //critical error - halt the cpu and blink leds.
-	}
- 	__delay_ms(100); //wait 1 second for SD card to initialize
-        sd_state = sd_init_status(); //returns 0 upon successful init, positive otherwise
-
-    } while(sd_state != 0);
-	
-    SD_PreEraseBlocks(8); //set the number of blocks to pre-erase to 8. This should increase the multi-block write performance.
     
-    //clear the buf_pos so that we are pointing to the start of the buffer
-   head=tail=0;
-	
-
-    
-   status = SD_ReadBlock(10000, &receive_buffer);
-   	
-    LED3 = 1; //inactive state
-    LED4 = 0; 
 
     
     //SD_WriteMultiBlockInit(SD_START_ADDRESS);

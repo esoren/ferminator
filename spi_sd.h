@@ -5,7 +5,7 @@
 unsigned char SPI1Wait(void);
 void SPI1Write(unsigned char data);
 unsigned char SPI1Read(void);
-unsigned char sd_init_status(void);
+unsigned char sd_init(void);
 unsigned char SPI_RW(unsigned char data);
 unsigned char SD_WriteCommand(unsigned char* cmd);
 unsigned char SD_ReadBlock(unsigned long addr, unsigned char *buf);

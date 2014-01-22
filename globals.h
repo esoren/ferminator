@@ -2,21 +2,10 @@
 #define INC_GLOBALS_H
  
 /*SETUP GLOBAL VARIABLES*/
-extern unsigned char LCD_digit;
-extern unsigned char LCD_dots;
-extern unsigned int LCD_value;
-extern unsigned long sd_address; 
-extern unsigned char receive_buffer;
-extern unsigned char *receive_ptr;
-extern unsigned volatile char sync_flag;
-extern volatile unsigned long head;
-extern volatile unsigned long tail;
-extern unsigned char transmit_buffer;
-//extern int num_of_params;
-extern unsigned int dma_adc_buf __attribute__((space(dma)));
-//extern unsigned char dma_dummy __attribute__((space(dma)));
-extern unsigned int T0_temp;
-extern unsigned int T1_temp;
-extern unsigned int T2_temp;
+
+extern unsigned int dma_adc_buf[16] __attribute__((space(dma))); //space in DMA memory to hold the ADC results
+
+
+
 #endif
 

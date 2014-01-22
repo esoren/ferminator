@@ -61,7 +61,7 @@
 
 /** @defgroup TIMER_DEFS Timer Definitions
  * @{ */
-#define TIMER2_ON		T2CONbits.TON
+#define TIMER2_ON		T2CONbits.TON  
 #define TIMER2_PERIOD 	200   //3200 = 12.5KHz 1600 = 25KHz, 800 = 50KHz, 500 = 80KHz, 640 = 62.5Khz
 /** @} */
 
@@ -98,6 +98,7 @@
 #define T1_AN  4
 #define T2_AN  5
 #define ADC_SOURCE  AD1CHS0bits.CH0SA
+#define ADC1_SAMP AD1CON1bits.SAMP
 
 
 /** @} */

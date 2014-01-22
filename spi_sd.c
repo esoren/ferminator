@@ -77,11 +77,18 @@ void SPI1Write(unsigned char data) {
  *  
  */
  
-unsigned char sd_init_status() {
+unsigned char sd_init() {
     unsigned int i,n,u = 0;
     unsigned char status = 0;
 
-   
+      //SD pins
+    SDO1_PIN_DIR = 0; //SDO1 as output
+    SDI1_PIN_DIR = 1; //SDI1 as input
+    CS1_PIN_DIR = 0; //CS1 as output
+    SCK1_PIN_DIR = 0; //SCK1 as output
+    SCK1_PIN = 1; //default on idle state
+
+
 
     //The SPI1 module is initially configured with a clock speed of ~300KHz
     //(assuming Fty = 40MHz). This is according to the sd card specification
@@ -304,7 +311,7 @@ unsigned char sd_init_status() {
     
     SPI1STATbits.SPIEN = 0; 
     SPI1CON1bits.SPRE = 0b110; //secondary prescaler = 2:1
-    SPI1CON1bits.PPRE = 0b11;  //primary prescaler = 1:1
+    SPI1CON1bits.PPRE = 0b01;  //primary prescaler = 16:1 (0b11 = 1:1)
     SPI1STATbits.SPIEN = 1;
     
     CS1_PIN = 0; //select the card
@@ -365,46 +372,46 @@ unsigned char sd_init_status() {
  *	\return R1 Response Format (single byte)
  */
  
-unsigned char SD_WriteCommand(unsigned char* cmd) {
-    unsigned int i;
-    unsigned char response;
-    unsigned char saved_CS1_PIN = CS1_PIN;
-
-    // SD Card Command Format
-    // (from Section 5.2.1 of SanDisk SD Card Product Manual v1.9).
-    // Frame 7 = 0
-    // Frame 6 = 1
-    // Command (6 bits)
-    // Address (32 bits)
-    // Frame 0 = 1
-
-    // Set the framing bits correctly
-    cmd[0] |= (1<<6);
-    cmd[0] &= ~(1<<7);
-    cmd[5] |= 1;
-	
-    // Send the 6 byte command
-    CS1_PIN = 0;
-    for(i = 0; i < 6; ++i) {
-        SPI1Write(*cmd);
-		cmd++;
-    }
-	
-    // Wait for the response
-    i = 0;
-    do {
-    	response = SPI1Read();
-    	if(i > 100)
-            break;
-	i++;
-    } while(response == 0xFF);
-	
-    CS1_PIN = 1;
-    SPI1Write(0xFF); //Sandisk SD Card Product Manual v1.9 section 5.1.8
-    CS1_PIN = saved_CS1_PIN;
-	
-    return(response);
-}
+//unsigned char SD_WriteCommand(unsigned char* cmd) {
+//    unsigned int i;
+//    unsigned char response;
+//    unsigned char saved_CS1_PIN = CS1_PIN;
+//
+//    // SD Card Command Format
+//    // (from Section 5.2.1 of SanDisk SD Card Product Manual v1.9).
+//    // Frame 7 = 0
+//    // Frame 6 = 1
+//    // Command (6 bits)
+//    // Address (32 bits)
+//    // Frame 0 = 1
+//
+//    // Set the framing bits correctly
+//    cmd[0] |= (1<<6);
+//    cmd[0] &= ~(1<<7);
+//    cmd[5] |= 1;
+//
+//    // Send the 6 byte command
+//    CS1_PIN = 0;
+//    for(i = 0; i < 6; ++i) {
+//        SPI1Write(*cmd);
+//		cmd++;
+//    }
+//
+//    // Wait for the response
+//    i = 0;
+//    do {
+//    	response = SPI1Read();
+//    	if(i > 100)
+//            break;
+//	i++;
+//    } while(response == 0xFF);
+//
+//    CS1_PIN = 1;
+//    SPI1Write(0xFF); //Sandisk SD Card Product Manual v1.9 section 5.1.8
+//    CS1_PIN = saved_CS1_PIN;
+//
+//    return(response);
+//}
 
 
 /*! \brief Starts a multi-block write 
@@ -577,24 +584,36 @@ unsigned char SD_WriteMultiBlockEnd () {
 unsigned char SD_WriteBlock(unsigned long addr, unsigned char *data) {//, unsigned char *buf) {
     unsigned int inc;
     unsigned char status;
-    unsigned char CMD24_WRITE_SINGLE_BLOCK[] = {24,0x00,0x00,0x00,0x00,0xFF};
-    CMD24_WRITE_SINGLE_BLOCK[1] = ((addr & 0xFF000000) >> 24);
-    CMD24_WRITE_SINGLE_BLOCK[2] = ((addr & 0x00FF0000) >> 16);
-    CMD24_WRITE_SINGLE_BLOCK[3] = ((addr & 0x0000FF00) >> 8);
-    CMD24_WRITE_SINGLE_BLOCK[4] = ((addr & 0x000000FF));
-	
-    CS1_PIN = 0; //enabled SD card
-	
-    // Send the write command
-    status = SD_WriteCommand(CMD24_WRITE_SINGLE_BLOCK);
+    unsigned char i = 0;
 
-    if(status != 0x00)
-        return 1; /*! \return 1 = Error: invalid response from CMD24 */
-	
+    CS1_PIN = 1;
+    SPI1Write(0xFF);
+    CS1_PIN = 0;
+    SPI1Write(0xFF);
+
+    if(sd_card_ready() != 1) return 1; /*! \return 1 = sd card is not ready */
+
+
+    /* Write CMD24 */
+    SPI1Write(0x40 | 24);
+    SPI1Write((addr & 0xFF000000) >> 24);
+    SPI1Write((addr & 0x00FF0000) >> 16);
+    SPI1Write((addr & 0x0000FF00) >> 8);
+    SPI1Write((addr & 0x000000FF));
+    SPI1Write(0xFF);
+
+    do {
+	status = SPI1Read();
+	if(i++ > 20) {
+            return 2; /*! \return 2 = CMD24 response timeout */
+        }
+    } while (status == 0xFF); //wait for R1 response
+
     SPI1Write(0xFE); //send data token
 	
     for(inc = 0; inc < BLOCK_SIZE; inc++) {
-		SPI1Write(*data);
+	//SPI1Write(*data);
+        SPI1Write(0xF0);
         data++;
     }
     SPI1Write(0xFF); //write CRC
@@ -608,13 +627,18 @@ unsigned char SD_WriteBlock(unsigned long addr, unsigned char *data) {//, unsign
 
     inc = 0;
     do {
-        if(inc++ > 100)
-            return 2; /* \return 2 = Error: no data token after write*/
-
+        if(inc++ > 100) {
+            
+            return 4; /* \return 2 = Error: no data token after write*/
+        }
         status = SPI1Read();
 
-        if((status & 0x1F) == 0x0D)
-            return 3; /* \return 3 = Error: write error (0x0D data token response)*/
+        if((status & 0x1F) == 0x0D) return 3; /* \return 3 = Error: write error (0x0D data token response)*/
+        if((status & 0x1F) != 0x00) {
+            Nop();
+            Nop();
+            Nop();
+        }
         
     } while((status & 0x1F) != 0x05); //wait for data token
 		
@@ -623,7 +647,7 @@ unsigned char SD_WriteBlock(unsigned long addr, unsigned char *data) {//, unsign
     	inc++;    /*I should have a timeout here, but I don't know how long
                     the card can take to write.. I need to look into this*/
     }
-	
+    Nop();
     CS1_PIN = 1;
     SPI1Write(0xFF);
     return 0;
@@ -782,52 +806,52 @@ unsigned char SD_ReadStatus(unsigned char *buf) {
  */
 
 unsigned char SD_ReadBlock(unsigned long addr, unsigned char *buf) {
-    unsigned int i;
-    unsigned char status;
-    unsigned char CMD17_READ_SINGLE_BLOCK[] = {17,0x00,0x00,0x00,0x00,0xFF};
-
-
-    CMD17_READ_SINGLE_BLOCK[1] = ((addr & 0xFF000000) >> 24);
-    CMD17_READ_SINGLE_BLOCK[2] = ((addr & 0x00FF0000) >> 16);
-    CMD17_READ_SINGLE_BLOCK[3] = ((addr & 0x0000FF00) >> 8);
-    CMD17_READ_SINGLE_BLOCK[4] = ((addr & 0x000000FF));
-
-    CS1_PIN = 0; //enable SD card
-
-    // Send the read command
-    status = SD_WriteCommand(CMD17_READ_SINGLE_BLOCK);
-    if(status != 0)
-        return 1;  /* \return 1 = Error: invalid response from CMD17*/
-	
-	
-    // Now wait for the "Start Block" token	(0xFE)
-    // (see SanDisk SD Card Product Manual v1.9 section 5.2.4. Data Tokens)
-    i = 0;
-    do {
-        if(i++ > START_BLOCK_TIMEOUT)
-            return 2; /* \return 2 = Error: no start block response
-                       */
-		status = SPI1Read();
-    } while(status != 0xFE);
-	
-    // Read off all the bytes in the block
-    for(i = 0; i < BLOCK_SIZE; ++i) {
-	status = SPI1Read();
-	*buf = status;
-	buf++;
-    }
-	
-    // Read CRC bytes
-    status = SPI1Read();
-    status = SPI1Read();
-
-    CS1_PIN = 1; //unselect SD Card
-
-    // Following a read transaction, the SD Card needs 8 clocks after the end
-    // bit of the last data block to finish up its work.
-    // (from SanDisk SD Card Product Manual v1.9 section 5.1.8)
-    SPI1Write(0xFF);
-
+//    unsigned int i;
+//    unsigned char status;
+//    unsigned char CMD17_READ_SINGLE_BLOCK[] = {17,0x00,0x00,0x00,0x00,0xFF};
+//
+//
+//    CMD17_READ_SINGLE_BLOCK[1] = ((addr & 0xFF000000) >> 24);
+//    CMD17_READ_SINGLE_BLOCK[2] = ((addr & 0x00FF0000) >> 16);
+//    CMD17_READ_SINGLE_BLOCK[3] = ((addr & 0x0000FF00) >> 8);
+//    CMD17_READ_SINGLE_BLOCK[4] = ((addr & 0x000000FF));
+//
+//    CS1_PIN = 0; //enable SD card
+//
+//    // Send the read command
+//    status = SD_WriteCommand(CMD17_READ_SINGLE_BLOCK);
+//    if(status != 0)
+//        return 1;  /* \return 1 = Error: invalid response from CMD17*/
+//
+//
+//    // Now wait for the "Start Block" token	(0xFE)
+//    // (see SanDisk SD Card Product Manual v1.9 section 5.2.4. Data Tokens)
+//    i = 0;
+//    do {
+//        if(i++ > START_BLOCK_TIMEOUT)
+//            return 2; /* \return 2 = Error: no start block response
+//                       */
+//		status = SPI1Read();
+//    } while(status != 0xFE);
+//
+//    // Read off all the bytes in the block
+//    for(i = 0; i < BLOCK_SIZE; ++i) {
+//	status = SPI1Read();
+//	*buf = status;
+//	buf++;
+//    }
+//
+//    // Read CRC bytes
+//    status = SPI1Read();
+//    status = SPI1Read();
+//
+//    CS1_PIN = 1; //unselect SD Card
+//
+//    // Following a read transaction, the SD Card needs 8 clocks after the end
+//    // bit of the last data block to finish up its work.
+//    // (from SanDisk SD Card Product Manual v1.9 section 5.1.8)
+//    SPI1Write(0xFF);
+//
     return 0; /* \return 0 = Successfully read block from sd card. Data is stored in the receive buffer*/
 }
 
@@ -918,3 +942,26 @@ unsigned char SD_PreEraseBlocks(unsigned int blocks) {
 }
 
 
+//   status = SD_WriteBlock(10000, &transmit_buffer);
+//   Nop();
+//   Nop();
+//   Nop();
+//   status = SD_ReadBlock(10000, &receive_buffer);
+
+
+//SD_WriteMultiBlockInit(SD_START_ADDRESS);
+//    //SPI1_16bit(1); //turn on 16 bit transfers for increased speed
+//    TIMER2_ON = 1;
+//    sd_address = SD_START_ADDRESS;
+//
+//    while(1) {
+//
+//
+//
+//	if((head < tail) || (head >= tail+BLOCK_SIZE)) { //CHECK these boundary conditions
+//			status = SD_WriteBlock(sd_address, &(transmit_buffer) + tail);
+//			tail += 512;
+//			tail &= BUFFER_SIZE-1;  //wrap around the tail
+//			sd_address++; //using SDHC, so each address references a 512 byte block
+//		}
+//	}	

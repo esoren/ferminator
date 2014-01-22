@@ -8,7 +8,40 @@
 #include <libpic30.h> //for delays
 
 
+unsigned char i2c_init() {
+    /*Set I2C Baud Rate */
+    /*Note: from dsPIC33F Family Reference Manual: I2C, section 19.4.3
+    Baud rate is set according to the following equation:
+    I2CBRG = (FCY/FSCL - FCY/10000000)-1   */
 
+    I2C2BRG = 395; //(100KHz @ 40Mhz FCY)
+    //I2C2BRG = 95; //(400Khz @ 50MHz FCY)
+        //(slightly intermittent results at 400K, need stronger pullups)
+
+    I2C2_SDA_PIN = 0;
+    I2C2_SCL_PIN = 0;
+    I2C2_SDA_PIN_DIR = 0;
+    I2C2_SCL_PIN_DIR = 0;
+
+    /*setup I2C Config */
+    I2C2CONbits.I2CSIDL = 0; //continue device operation in idle mode
+    I2C2CONbits.SCLREL = 0; //Release SCLx clock in slave mode
+    I2C2CONbits.IPMIEN = 0; //IPMI enable
+    I2C2CONbits.A10M = 0; //7 bit slave address
+    I2C2CONbits.DISSLW = 1; //slew rate control disabled
+    I2C2CONbits.SMEN = 0; //SMBus Input Levels  (???)
+    I2C2CONbits.GCEN = 0; //general call interrupt in slave mode
+    I2C2CONbits.STREN = 0; //disable clock stretching
+    I2C2CONbits.ACKDT = 0; //send ACK during acknowledge  (1 == ACK, 0 = NACK)
+    I2C2CONbits.ACKEN = 0; //used to initiate ACK sequence
+    I2C2CONbits.RCEN = 0; //receive enable bit
+    I2C2CONbits.PEN = 0; //initiate hardware stop condition
+    I2C2CONbits.RSEN = 0; //repeated start condition enable bit
+    I2C2CONbits.SEN = 0; //Start condition enable bit
+    I2C2CONbits.I2CEN = 1; //enable I2C
+
+    return 0;
+}
 
 unsigned char i2c_read_byte(unsigned char slave_address, unsigned char slave_register) {
     unsigned char i2c_val;
@@ -112,3 +145,27 @@ unsigned char i2c_write_byte (unsigned char slave_address, unsigned char slave_r
     return 0;
 
 }
+
+
+//Test write the time (add functionality for this over serial later..)
+    //i2c_write_byte(RTC_ADDRESS, RTC_HOUR, 13);
+    //i2c_write_byte(RTC_ADDRESS, RTC_MINUTES, 0b01010111);
+    //i2c_write_byte(RTC_ADDRESS, RTC_SECONDS, 7);
+
+
+//   while(1==1) {
+//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
+//       minutes = (i2c_buf >>4); //tens digit
+//       minutes *= 10;
+//       temp = i2c_buf & 0x0F;
+//       minutes += temp; //ones digit
+//
+//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
+//       seconds = (i2c_buf >> 4); //tens digit
+//       seconds *= 10;
+//       temp = i2c_buf & 0x0F;
+//       seconds += temp; //ones digit
+//
+//       LCD_value = 100*minutes + seconds;
+//
+//   }

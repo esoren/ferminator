@@ -3,6 +3,6 @@
 #define INC_DISPLAY_H
 
 unsigned char lcd_display(int value, char display, char dots);
-
+unsigned char lcd_init();
 #endif
 

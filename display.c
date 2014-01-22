@@ -8,6 +8,46 @@
 #include <libpic30.h> //for delays
 
 
+/*! \brief Initializes LCD Display
+ * This function setups up the IO for the LCD display.
+ */
+
+unsigned char lcd_init() {
+      //LCD PINS
+    //turn off all characters/segments:
+    K1 = 0; //K pins are active high
+    K2 = 0;
+    K3 = 0;
+    K4 = 0;
+    K5 = 0;
+    AA1 = 1; //A pins are active low
+    AB2 = 1;
+    AC3 = 1;
+    AD = 1;
+    AE = 1;
+    AF = 1;
+    AG = 1;
+    ADP = 1;
+    //setup lcd pins as outputs
+    K1_DIR = 0;
+    K2_DIR = 0;
+    K3_DIR = 0;
+    K4_DIR = 0;
+    K5_DIR = 0;
+    AA1_DIR = 0;
+    AB2_DIR = 0;
+    AC3_DIR = 0;
+    AD_DIR = 0;
+    AE_DIR = 0;
+    AF_DIR = 0;
+    AG_DIR = 0;
+    ADP_DIR = 0;
+
+    PMD2bits.OC8MD = 0;
+    CNPU2bits.CN16PUE = 0; //turn off pullup
+
+    return 0;
+}
 
 /*! \brief Displays value on the LCD screen
  *

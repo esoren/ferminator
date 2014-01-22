@@ -16,6 +16,7 @@
 #include <i2c.h>
 #include "i2c.h"
 #include <libpic30.h> //for delays
+#include "serial.h"
 
 /* CONFIG SETTINGS  */
 //see section 22.1 of the PIC33FJ256GP510A datasheet for config settings
@@ -25,10 +26,19 @@ _FOSC( POSCMD_EC & OSCIOFNC_OFF & FCKSM_CSECMD) //EC oscillator, oscillator swit
 _FWDT( FWDTEN_OFF ) // WDT software enabled/disabled (off)
 _FICD( ICS_PGD2 & JTAGEN_OFF ) //jtag disabled, communicate on PGED/C 1
 
+/* STATIC VARIABLES */
+static unsigned char LCD_dots = 0;
+static unsigned int LCD_value = 0;
+static unsigned int T0_temp = 0;
+static unsigned int T1_temp = 0;
+static unsigned int T2_temp = 0;
+
 
 /* FUNCTION PROTOTYPES*/
 int main (void);
-void error(unsigned int error_num); 
+void error(unsigned int error_num);
+void __attribute__((__interrupt__)) _DMA0Interrupt(void);
+void __attribute__((__interrupt__)) _DMA1Interrupt(void);
 	
 /*! \brief Halts operation and blinks LEDs
  *         
@@ -66,7 +76,7 @@ void error(unsigned int error_num) {
  *
  */
 
-void __attribute__((__interrupt__)) _DMA0Interrupt(void);
+
 void __attribute__((__interrupt__, auto_psv)) _DMA0Interrupt(void)
 {
 
@@ -82,7 +92,7 @@ void __attribute__((__interrupt__, auto_psv)) _DMA0Interrupt(void)
  *
  */
 
-void __attribute__((__interrupt__)) _DMA1Interrupt(void);
+
 void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
 {
     unsigned int adc_accum = 0;
@@ -95,22 +105,22 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
 
     LED3 = 1;
     LED4 = 1;
-    adc_accum += *(&dma_adc_buf);
-    adc_accum += *(&dma_adc_buf+1);
-    adc_accum += *(&dma_adc_buf+2);
-    adc_accum += *(&dma_adc_buf+3);
-    adc_accum += *(&dma_adc_buf+4);
-    adc_accum += *(&dma_adc_buf+5);
-    adc_accum += *(&dma_adc_buf+6);
-    adc_accum += *(&dma_adc_buf+7);
-    adc_accum += *(&dma_adc_buf+8);
-    adc_accum += *(&dma_adc_buf+9);
-    adc_accum += *(&dma_adc_buf+10);
-    adc_accum += *(&dma_adc_buf+11);
-    adc_accum += *(&dma_adc_buf+12);
-    adc_accum += *(&dma_adc_buf+13);
-    adc_accum += *(&dma_adc_buf+14);
-    adc_accum += *(&dma_adc_buf+15);
+    adc_accum += (int)*(&dma_adc_buf);
+    adc_accum += (int)*(&dma_adc_buf+1);
+    adc_accum += (int)*(&dma_adc_buf+2);
+    adc_accum += (int)*(&dma_adc_buf+3);
+    adc_accum += (int)*(&dma_adc_buf+4);
+    adc_accum += (int)*(&dma_adc_buf+5);
+    adc_accum += (int)*(&dma_adc_buf+6);
+    adc_accum += (int)*(&dma_adc_buf+7);
+    adc_accum += (int)*(&dma_adc_buf+8);
+    adc_accum += (int)*(&dma_adc_buf+9);
+    adc_accum += (int)*(&dma_adc_buf+10);
+    adc_accum += (int)*(&dma_adc_buf+11);
+    adc_accum += (int)*(&dma_adc_buf+12);
+    adc_accum += (int)*(&dma_adc_buf+13);
+    adc_accum += (int)*(&dma_adc_buf+14);
+    adc_accum += (int)*(&dma_adc_buf+15);
 
     if(ADC_SOURCE == T1_AN || ADC_SOURCE == T2_AN) {
         /*T1_AN and T2_AN are thermistor inputs (100k)*/
@@ -204,6 +214,7 @@ void __attribute__((__interrupt__, auto_psv)) _DMA1Interrupt(void)
 void __attribute__((__interrupt__)) _T2Interrupt(void);
 void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
 {
+    static unsigned char LCD_digit = 0; //assuming this is done only once with a static variable
     LCD_digit = (LCD_digit + 1) % 5;
     lcd_display(LCD_digit, LCD_value, LCD_dots);
  
@@ -223,26 +234,34 @@ void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
  */
 
 int main (void) {
-    unsigned int config2, config1;
-    unsigned char i2c_val_main = 1;
-    unsigned char command = 0;
     unsigned char status = 0;
     unsigned char sd_state = 0;
     unsigned char sd_attempt = 0;
-    unsigned long mem_address = 0;
     unsigned char inc = 0;
     unsigned char digit_inc = 0;
     unsigned int count = 0;
     unsigned char input_sensor = 2; 
-    unsigned char test_val;
     unsigned char hours, minutes, seconds, i2c_buf;
-    unsigned char temp = 0;
-    Nop();
+    unsigned long sd_address = 0; ///current active sd card address
+    unsigned char receive_buffer[512];
+    unsigned char transmit_buffer[2048];
+    unsigned char *transmit_ptr = &transmit_buffer[0];
+    unsigned char *receive_ptr = &receive_buffer[0];
+    unsigned volatile long head = 0; ///write position of the buffer (where the next adc sample is stored in the circular buffer)
+    unsigned volatile long tail = 0; ///read position of the buffer (where the samples are read out of the buffer and sent to the sd card)
+
+    
     LCD_value = 0000;
     init();
+    lcd_init();
+    timer2_init();
+    adc_init();
+    i2c_init();
+    uart_init();
+
     LED3 = 1; 
-    T2CONbits.TON = 1;
-    AD1CON1bits.SAMP = 1; //start converting
+    TIMER2_ON = 1;
+    ADC1_SAMP = 1; //start converting
     LCD_dots = 0b00000011;
     T2_LED = 1;
 
@@ -250,63 +269,21 @@ int main (void) {
     AD1CHS0bits.CH0SA = 3;
 
 
-
-   //Test write the time (add functionality for this over serial later..)
-    //i2c_write_byte(RTC_ADDRESS, RTC_HOUR, 13);
-    //i2c_write_byte(RTC_ADDRESS, RTC_MINUTES, 0b01010111);
-    //i2c_write_byte(RTC_ADDRESS, RTC_SECONDS, 7);
-
-
-
-//   while(1==1) {
-//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
-//       minutes = (i2c_buf >>4); //tens digit
-//       minutes *= 10;
-//       temp = i2c_buf & 0x0F;
-//       minutes += temp; //ones digit
-//
-//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
-//       seconds = (i2c_buf >> 4); //tens digit
-//       seconds *= 10;
-//       temp = i2c_buf & 0x0F;
-//       seconds += temp; //ones digit
-//
-//       LCD_value = 100*minutes + seconds;
-//
-//   }
-
     sd_address = SD_START_ADDRESS; /* the writing starts a few kb into the sd card to leave room for housekeeping */
-    LED3 = 1;
-    __delay_ms(200);
-    LED4 = 1;
-    __delay_ms(2000); //4 second delay to allow analog stages to stabilize
+    __delay_ms(1000); //1 second delay to allow analog stages to stabilize
 
-
-    Nop();
-    Nop();
-    sd_attempt = 0;
-    do {
-        if(++sd_attempt > 3) {
-            error(SD_CARD_NOT_INITIALIZED);  //error();  //critical error - halt the cpu and blink leds.
-	}
- 	__delay_ms(100); //wait 1 second for SD card to initialize
-        sd_state = sd_init_status(); //returns 0 upon successful init, positive otherwise
-
-    } while(sd_state != 0);
-
-    SD_PreEraseBlocks(8); //set the number of blocks to pre-erase to 8. This should increase the multi-block write performance.
-
+    sd_state = sd_init(); //returns 0 upon successful init, positive otherwise
+    if(sd_state != 0) {
+        error(SD_CARD_NOT_INITIALIZED);
+    }
+    
     //clear the buf_pos so that we are pointing to the start of the buffer
-   head=tail=0;
-
-
-
-   status = SD_ReadBlock(10000, &receive_buffer);
+    head=tail=0;
 
    LED3 = 1; //inactive state
    LED4 = 0;
 
-   while(1==1){
+   while(1){
       
         
         if(SW_SEL == 0) {
@@ -348,33 +325,7 @@ int main (void) {
 
     }
 
-       
-
-    
-
-
-
-
-
-    
-
-    
-    //SD_WriteMultiBlockInit(SD_START_ADDRESS);
-    //SPI1_16bit(1); //turn on 16 bit transfers for increased speed
-    TIMER2_ON = 1;
-    sd_address = SD_START_ADDRESS;
-     
-    while(1==1) {
-
-
-		
-	if((head < tail) || (head >= tail+BLOCK_SIZE)) { //CHECK these boundary conditions
-			status = SD_WriteBlock(sd_address, &(transmit_buffer) + tail);
-			tail += 512; 
-			tail &= BUFFER_SIZE-1;  //wrap around the tail
-			sd_address++; //using SDHC, so each address references a 512 byte block
-		}	
-	}				
+//
     
     
 

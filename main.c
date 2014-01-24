@@ -270,60 +270,68 @@ int main (void) {
 
 
     sd_address = SD_START_ADDRESS; /* the writing starts a few kb into the sd card to leave room for housekeeping */
-    __delay_ms(1000); //1 second delay to allow analog stages to stabilize
+    //__delay_ms(1000); //1 second delay to allow analog stages to stabilize
 
-    sd_state = sd_init(); //returns 0 upon successful init, positive otherwise
-    if(sd_state != 0) {
-        error(SD_CARD_NOT_INITIALIZED);
-    }
+    //sd_state = sd_init(); //returns 0 upon successful init, positive otherwise
     
     //clear the buf_pos so that we are pointing to the start of the buffer
     head=tail=0;
 
-   LED3 = 1; //inactive state
-   LED4 = 0;
-
-   while(1){
-      
-        
-        if(SW_SEL == 0) {
-            input_sensor = (input_sensor + 4) % 3;
-            T0_LED = 0;
-            T1_LED = 0;
-            T2_LED = 0;
-            switch(input_sensor){
-                case 0:
-                    T0_LED = 1;
-                    break;
-                case 1:
-                    T1_LED = 1;
-                    break;
-                case 2:
-                    T2_LED = 1;
-                    break;
-            }
-            __delay_ms(250);
-        }
+    LED3 = 1; //inactive state
+    LED4 = 0;
 
 
+    
+    
+    TIMER2_ON = 1;
+    sd_address = SD_START_ADDRESS;
 
-        switch(input_sensor){
-            case 0:
-                T0_LED = 1;
-                LCD_value = T0_temp;
-                break;
-            case 1:
-                T1_LED = 1;
-                LCD_value = T1_temp;
-                break;
-            case 2:
-                T2_LED = 1;
-                LCD_value = T2_temp;
-                break;
-        }
-        
+   
 
-    }
+   IFS0bits.U1TXIF=0;
+   while(1==1){
+       
+       
+       __delay_ms(100);
+   }
+//        if(SW_SEL == 0) {
+//            input_sensor = (input_sensor + 4) % 3;
+//            T0_LED = 0;
+//            T1_LED = 0;
+//            T2_LED = 0;
+//            switch(input_sensor){
+//                case 0:
+//                    T0_LED = 1;
+//                    break;
+//                case 1:
+//                    T1_LED = 1;
+//                    break;
+//                case 2:
+//                    T2_LED = 1;
+//                    break;
+//            }
+//            __delay_ms(250);
+//        }
+//
+//
+//
+//        switch(input_sensor){
+//            case 0:
+//                T0_LED = 1;
+//                LCD_value = T0_temp;
+//                break;
+//            case 1:
+//                T1_LED = 1;
+//                LCD_value = T1_temp;
+//                break;
+//            case 2:
+//                T2_LED = 1;
+//                LCD_value = T2_temp;
+//                break;
+//        }
+//
+//        __delay_ms(100);
+//    }
 
 //
     

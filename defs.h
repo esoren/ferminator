@@ -10,6 +10,7 @@
 
 #define FCY 40000000UL ///40 MIPS operating speed (used for __delay_ms() and __delay_S())
 
+#define BREAKPOINT Nop();Nop();Nop();
 /** @defgroup LEDS LEDS
  * @{ */
 #define T0_LED      LATCbits.LATC1

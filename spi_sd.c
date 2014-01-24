@@ -311,33 +311,32 @@ unsigned char sd_init() {
     
     SPI1STATbits.SPIEN = 0; 
     SPI1CON1bits.SPRE = 0b110; //secondary prescaler = 2:1
-    SPI1CON1bits.PPRE = 0b01;  //primary prescaler = 16:1 (0b11 = 1:1)
+    SPI1CON1bits.PPRE = 0b11;  //primary prescaler = 16:1 (0b11 = 1:1)
     SPI1STATbits.SPIEN = 1;
     
     CS1_PIN = 0; //select the card
 	
     i = 0;
     do {
-	if(i++ > CMD58_TIMEOUT2) 
-            return 10; /*! \return 10 = CMD58 ERROR (timeout) */
+	if(i++ > CMD58_TIMEOUT2) return 10; /*! \return 10 = CMD58 ERROR (timeout) */
 
     CS1_PIN = 1;
-	SPI1Write(0xFF);
-	CS1_PIN = 0; 
-	SPI1Write(0xFF);
+    SPI1Write(0xFF);
+    CS1_PIN = 0;
+    SPI1Write(0xFF);
 	
-        if(sd_card_ready() != 1)
-            return 11; /*! \return 11 = CMD58 ERROR (SPI1Wait() timeout) */
+    if(sd_card_ready() != 1)
+    return 11; /*! \return 11 = CMD58 ERROR (SPI1Wait() timeout) */
 		
 		
 		
     SPI1Write(0xFF);
-	SPI1Write(0x7A); //cmd58 = 0x7A 00 00 00 00 FF
-	SPI1Write(0x00);
-	SPI1Write(0x00);
-	SPI1Write(0x00);
-	SPI1Write(0x00);
-	SPI1Write(0xFF);
+    SPI1Write(0x7A); //cmd58 = 0x7A 00 00 00 00 FF
+    SPI1Write(0x00);
+    SPI1Write(0x00);
+    SPI1Write(0x00);
+    SPI1Write(0x00);
+    SPI1Write(0xFF);
 		
 	n = 0;
 	do {
@@ -949,19 +948,22 @@ unsigned char SD_PreEraseBlocks(unsigned int blocks) {
 //   status = SD_ReadBlock(10000, &receive_buffer);
 
 
-//SD_WriteMultiBlockInit(SD_START_ADDRESS);
-//    //SPI1_16bit(1); //turn on 16 bit transfers for increased speed
-//    TIMER2_ON = 1;
-//    sd_address = SD_START_ADDRESS;
 //
+// for(inc = 0; inc < 512; inc++) {
+//        *(transmit_buffer+inc) = 0xAA;
+//    }
+//    status = SD_WriteBlock(sd_address, &(transmit_buffer));
+//    Nop();
+//    Nop();
+//    Nop();
 //    while(1) {
 //
 //
 //
 //	if((head < tail) || (head >= tail+BLOCK_SIZE)) { //CHECK these boundary conditions
-//			status = SD_WriteBlock(sd_address, &(transmit_buffer) + tail);
-//			tail += 512;
-//			tail &= BUFFER_SIZE-1;  //wrap around the tail
-//			sd_address++; //using SDHC, so each address references a 512 byte block
-//		}
-//	}	
+//            status = SD_WriteBlock(sd_address, &(transmit_buffer) + tail);
+//            tail += 512;
+//            tail &= BUFFER_SIZE-1;  //wrap around the tail
+//            sd_address++; //using SDHC, so each address references a 512 byte block
+//	}
+//    }

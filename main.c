@@ -16,7 +16,8 @@
 #include <i2c.h>
 #include "i2c.h"
 #include <libpic30.h> //for delays
-#include "serial.h"
+#include "uart.h"
+#include "rtc.h"
 
 /* CONFIG SETTINGS  */
 //see section 22.1 of the PIC33FJ256GP510A datasheet for config settings
@@ -241,7 +242,6 @@ int main (void) {
     unsigned char digit_inc = 0;
     unsigned int count = 0;
     unsigned char input_sensor = 2; 
-    unsigned char hours, minutes, seconds, i2c_buf;
     unsigned long sd_address = 0; ///current active sd card address
     unsigned char receive_buffer[512];
     unsigned char transmit_buffer[2048];
@@ -249,7 +249,7 @@ int main (void) {
     unsigned char *receive_ptr = &receive_buffer[0];
     unsigned volatile long head = 0; ///write position of the buffer (where the next adc sample is stored in the circular buffer)
     unsigned volatile long tail = 0; ///read position of the buffer (where the samples are read out of the buffer and sent to the sd card)
-
+    timeData myTime;
     
     LCD_value = 0000;
     init();
@@ -258,6 +258,7 @@ int main (void) {
     adc_init();
     i2c_init();
     uart_init();
+    rtc_init();
 
     LED3 = 1; 
     TIMER2_ON = 1;
@@ -290,7 +291,7 @@ int main (void) {
 
    IFS0bits.U1TXIF=0;
    while(1==1){
-       
+       read_time(&myTime);
        
        __delay_ms(100);
    }

@@ -147,25 +147,3 @@ unsigned char i2c_write_byte (unsigned char slave_address, unsigned char slave_r
 }
 
 
-//Test write the time (add functionality for this over serial later..)
-    //i2c_write_byte(RTC_ADDRESS, RTC_HOUR, 13);
-    //i2c_write_byte(RTC_ADDRESS, RTC_MINUTES, 0b01010111);
-    //i2c_write_byte(RTC_ADDRESS, RTC_SECONDS, 7);
-
-
-//   while(1==1) {
-//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_MINUTES);
-//       minutes = (i2c_buf >>4); //tens digit
-//       minutes *= 10;
-//       temp = i2c_buf & 0x0F;
-//       minutes += temp; //ones digit
-//
-//       i2c_buf = i2c_read_byte(RTC_ADDRESS, RTC_SECONDS);
-//       seconds = (i2c_buf >> 4); //tens digit
-//       seconds *= 10;
-//       temp = i2c_buf & 0x0F;
-//       seconds += temp; //ones digit
-//
-//       LCD_value = 100*minutes + seconds;
-//
-//   }

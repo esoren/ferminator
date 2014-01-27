@@ -182,7 +182,7 @@
 
 #define RTC_SECONDS     0x00
 #define RTC_MINUTES     0x01
-#define RTC_HOUR        0x02
+#define RTC_HOURS       0x02
 #define RTC_DAY         0x03
 #define RTC_DATE        0x04
 #define RTC_MONTH       0x05

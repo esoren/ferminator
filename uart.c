@@ -1,7 +1,7 @@
 #include <p33FJ256GP510A.h>
 #include "defs.h"
 #include "globals.h"
-#include "serial.h"
+#include "uart.h"
 
 
 

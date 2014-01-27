@@ -17,5 +17,8 @@ typedef struct timeData {
 
 unsigned char read_time(timeData *pTimeData);
 unsigned char rtc_init();
+char makedigit (unsigned char number, unsigned char base);
+unsigned char load_reset_time(timeData *pTimeData);
+unsigned char write_time(timeData *pTimeData);
 
 #endif

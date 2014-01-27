@@ -50,7 +50,19 @@ unsigned char uart_init() {
 }
 
 unsigned char uart_write_byte(unsigned char byte) {
+    while(!U1STAbits.TRMT); //wait for the device to be done transmitting
     U1TXREG=byte;
-    while(U1STAbits.TRMT); //wait for the device to be done transmitting
+    
     return 0; 
+}
+
+unsigned char uart_write_string(unsigned char *string, unsigned char length) {
+    unsigned char inc = 0;
+
+    for(inc = 0; inc < length; inc++) {
+        uart_write_byte(string[inc]);
+    }
+    uart_write_byte('\n');
+    
+    return 0;
 }

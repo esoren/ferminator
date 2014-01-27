@@ -249,8 +249,10 @@ int main (void) {
     unsigned char *receive_ptr = &receive_buffer[0];
     unsigned volatile long head = 0; ///write position of the buffer (where the next adc sample is stored in the circular buffer)
     unsigned volatile long tail = 0; ///read position of the buffer (where the samples are read out of the buffer and sent to the sd card)
-    timeData myTime;
-    
+    timeData getTime;
+
+
+
     LCD_value = 0000;
     init();
     lcd_init();
@@ -259,6 +261,9 @@ int main (void) {
     i2c_init();
     uart_init();
     rtc_init();
+
+
+
 
     LED3 = 1; 
     TIMER2_ON = 1;
@@ -291,9 +296,10 @@ int main (void) {
 
    IFS0bits.U1TXIF=0;
    while(1==1){
-       read_time(&myTime);
-       
-       __delay_ms(100);
+       read_time(&getTime);
+       uart_write_string(&getTime.timestring[0], 13);
+
+       __delay_ms(1000);
    }
 //        if(SW_SEL == 0) {
 //            input_sensor = (input_sensor + 4) % 3;
